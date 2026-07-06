@@ -20,7 +20,7 @@
 
     <div class="login-card">
         <div class="login-header">
-            <h1>Mesa de Partes</h1>
+            <h1>LOGIN</h1>
             <p>Universidad Nacional José Faustino Sánchez Carrión</p>
         </div>
 

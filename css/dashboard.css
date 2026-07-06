@@ -1,0 +1,134 @@
+:root {
+    --azul-institucional: #0a4275;
+    --azul-oscuro: #062847;
+    --dorado-arena: #c5a059;
+    --blanco-transparente: rgba(255, 255, 255, 0.95);
+    --fondo-gris: #f4f6f9;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+
+/* FONDO Y CAPA OSCURA */
+body { 
+    background-image: url('../img/img_principal.png'); /* Asegúrate de que la ruta sea correcta */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: #333; 
+    min-height: 100vh;
+}
+body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(6, 40, 71, 0.75); z-index: -1;
+}
+
+/* NAVBAR */
+.navbar {
+    background-color: var(--azul-oscuro); padding: 0 40px; height: 70px; display: flex;
+    justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dorado-arena);
+}
+.navbar-brand { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.4rem; color: white; letter-spacing: 1px;}
+.navbar-brand span { color: var(--dorado-arena); }
+.nav-links { display: flex; height: 100%; }
+.nav-links a { color: white; text-decoration: none; font-size: 0.95rem; font-weight: 500; padding: 0 20px; display: flex; align-items: center; transition: all 0.3s; border-bottom: 3px solid transparent;}
+.nav-links a:hover, .nav-links a.active { color: var(--dorado-arena); border-bottom: 3px solid var(--dorado-arena); background-color: rgba(255,255,255,0.05);}
+.btn-logout { background-color: #dc3545; color: white !important; border-radius: 4px; height: 40px !important; margin-top: 15px; margin-left: 20px; padding: 0 20px !important; border-bottom: none !important;}
+.btn-logout:hover { background-color: #c82333; }
+
+/* CONTENEDORES Y PANELES */
+.container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+.container-sm { max-width: 900px; margin: 40px auto; padding: 0 20px; } /* Para el perfil */
+.panel { background: var(--blanco-transparente); padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); backdrop-filter: blur(10px); }
+.panel-title { color: var(--azul-institucional); font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 20px; border-bottom: 2px solid var(--dorado-arena); padding-bottom: 10px; }
+
+/* GRIDS Y PERFIL */
+.dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; margin-top: 25px; }
+.profile-mini { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
+.profile-photo { width: 80px; height: 80px; background-color: #e9ecef; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #adb5bd; border: 3px solid var(--dorado-arena); }
+.profile-info h3 { color: var(--azul-oscuro); font-size: 1.1rem;}
+.profile-info p { color: #555; font-size: 0.9rem; margin-top: 3px;}
+.badge { background-color: var(--dorado-arena); color: white; padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-top: 8px; text-transform: uppercase;}
+
+/* BOTONES */
+.action-btn { display: block; width: 100%; text-align: center; padding: 15px; margin-bottom: 15px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: transform 0.2s; }
+.action-btn:hover { transform: translateY(-3px); }
+.btn-primary { background-color: var(--azul-institucional); color: white; }
+.btn-secondary { background-color: white; color: var(--azul-institucional); border: 2px solid var(--azul-institucional); }
+.btn-submit { background-color: var(--azul-institucional); color: white; border: none; padding: 15px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; margin-top: 20px; width: 100%; }
+.btn-submit:hover { background-color: var(--dorado-arena); }
+
+/* ESTADÍSTICAS Y TABLAS */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+.stat-card { background: white; padding: 20px; border-radius: 8px; text-align: center; border-left: 4px solid var(--dorado-arena); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.stat-card h2 { color: var(--azul-oscuro); font-size: 2rem; margin-bottom: 5px; }
+.stat-card p { color: #666; font-size: 0.85rem; font-weight: 500; text-transform: uppercase; }
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+th { background-color: var(--fondo-gris); color: var(--azul-oscuro); font-weight: 600; }
+tr:hover { background-color: #f9f9f9; }
+.status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.status-proceso { background: #cce5ff; color: #004085; }
+.status-atendido { background: #d4edda; color: #155724; }
+
+/* FORMULARIOS (Para Perfil y Nuevo Trámite) */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-group { display: flex; flex-direction: column; }
+.form-group.full-width { grid-column: span 2; }
+.form-group label { font-size: 0.85rem; font-weight: 600; color: var(--azul-oscuro); margin-bottom: 8px; text-transform: uppercase; }
+.form-group input, .form-group select, .form-group textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; transition: border 0.3s; background: white; font-family: 'Montserrat', sans-serif;}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--dorado-arena); outline: none; }
+input[readonly] { background-color: #e9ecef; color: #6c757d; border: 1px dashed #adb5bd; cursor: not-allowed; }
+.alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500; }
+.alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.helper-text { font-size: 0.8rem; color: #dc3545; margin-top: 5px; font-style: italic; }
+
+/* =========================================
+   MENÚ DESPLEGABLE (DROPDOWNS) CORREGIDO
+========================================= */
+
+
+.dropdown {
+    position: relative;
+    display: flex; /* Cambiado a flex para alineación perfecta */
+    align-items: center;
+    height: 100%;
+}
+
+.dropbtn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 15px; /* Mismo relleno que tus enlaces <a> normales */
+    color: #e0e0e0; /* O el color que usen tus enlaces inactivos */
+    font-weight: 500;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--azul-oscuro);
+    min-width: 220px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.4);
+    z-index: 10;
+    top: 70px; /* Misma altura del navbar */
+    border-top: 3px solid var(--dorado-arena);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+.dropdown-content a {
+    color: white;
+    padding: 15px 20px;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    height: auto;
+}
+.dropdown-content a:hover {
+    background-color: rgba(255,255,255,0.1);
+    color: var(--dorado-arena);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.dropdown:hover .dropdown-content {
+    display: block;
+}
