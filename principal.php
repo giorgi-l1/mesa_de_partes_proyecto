@@ -118,7 +118,7 @@ if ($res_stats) {
                     <a href="cambiar_password.php">Cambiar Contraseña</a>
                 </div>
             </div>
-
+            <a href="mesa_ayuda.php" class="active">Mesa de Ayuda</a>
             <a href="cerrar_session.php" class="btn-logout">Cerrar Sesión</a>
         </div>
     </nav>
@@ -223,7 +223,7 @@ if ($res_stats) {
 
                                         echo "<tr>";
                                         echo "<td><strong>" . $tramite['numero_expediente'] . "</strong></td>"; // Mostramos el EXP real
-                                        echo "<td>" . $tramite['nombre_tipo'] . "</td>";
+                                        echo "<td>" . $tramite['nombre_tramite'] . "</td>";
                                         echo "<td>" . $fecha_formateada . "</td>";
                                         echo "<td><span class='status-badge $clase_badge'>" . $tramite['nombre_estado'] . "</span></td>";
                                         echo "</tr>";

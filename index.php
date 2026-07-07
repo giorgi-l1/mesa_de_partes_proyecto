@@ -40,10 +40,11 @@
                 <label for="tipo_login">Tipo de Perfil</label>
                 <select name="tipo_login" id="tipo_login" required>
                     <option value="" disabled selected>-- Seleccione --</option>
-                    <option value="1">Alumno</option>
-                    <option value="2">Docente / Personal</option>
-                    <option value="3">Egresado</option>
+                    <option value="1">Persona Natural</option>
+                    <option value="2">Alumno</option>
+                    <option value="3">Personal</option>
                     <option value="4">Institución Externa</option>
+                    <option value="5">Egresado</option>
                 </select>
             </div>
             <div class="form-group">

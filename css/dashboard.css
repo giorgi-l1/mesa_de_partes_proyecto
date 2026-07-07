@@ -72,11 +72,34 @@ tr:hover { background-color: #f9f9f9; }
 .status-atendido { background: #d4edda; color: #155724; }
 
 /* FORMULARIOS (Para Perfil y Nuevo Trámite) */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.form-group { display: flex; flex-direction: column; }
+.form-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+    width: 100%; 
+}
+.form-group { 
+    display: flex; 
+    flex-direction: column; 
+    min-width: 0; 
+    width: 100%; 
+}
 .form-group.full-width { grid-column: span 2; }
 .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--azul-oscuro); margin-bottom: 8px; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; transition: border 0.3s; background: white; font-family: 'Montserrat', sans-serif;}
+.form-group input, 
+.form-group select, 
+.form-group textarea { 
+    width: 100%; 
+    max-width: 100%; 
+    box-sizing: border-box; 
+    padding: 12px; 
+    border: 1px solid #ccc; 
+    border-radius: 6px; 
+    font-size: 1rem; 
+    transition: border 0.3s; 
+    background: white; 
+    font-family: 'Montserrat', sans-serif; 
+}
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--dorado-arena); outline: none; }
 input[readonly] { background-color: #e9ecef; color: #6c757d; border: 1px dashed #adb5bd; cursor: not-allowed; }
 .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500; }
