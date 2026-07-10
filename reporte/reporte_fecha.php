@@ -6,13 +6,11 @@ $fechaInicio = "";
 $fechaFin = "";
 $where = "";
 
-if(isset($_GET["buscar"]))
-{
+if (isset($_GET["buscar"])) {
     $fechaInicio = $_GET["fecha_inicio"];
     $fechaFin = $_GET["fecha_fin"];
 
-    if($fechaInicio!="" && $fechaFin!="")
-    {
+    if ($fechaInicio != "" && $fechaFin != "") {
         $where = "
         WHERE DATE(t.fecha_envio)
         BETWEEN '$fechaInicio'
@@ -21,7 +19,7 @@ if(isset($_GET["buscar"]))
     }
 }
 
-$sql="
+$sql = "
 
 SELECT
 
@@ -59,7 +57,7 @@ ORDER BY t.fecha_envio DESC
 
 ";
 
-$resultado=mysqli_query($cn,$sql);
+$resultado = mysqli_query($cn, $sql);
 
 ?>
 
@@ -69,399 +67,375 @@ $resultado=mysqli_query($cn,$sql);
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>
+    <title>
 
-Reporte por Fechas
+        Reporte por Fechas
 
-</title>
+    </title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Montserrat:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
 
-<link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
 
-<style>
+    <style>
+        .filtros {
 
-.filtros{
+            display: grid;
 
-display:grid;
+            grid-template-columns: 1fr 1fr auto;
 
-grid-template-columns:1fr 1fr auto;
+            gap: 20px;
 
-gap:20px;
+            margin-top: 20px;
 
-margin-top:20px;
+            margin-bottom: 25px;
 
-margin-bottom:25px;
+        }
 
-}
+        .form-control {
 
-.form-control{
+            width: 100%;
 
-width:100%;
+            padding: 10px;
 
-padding:10px;
+            border: 1px solid #ccc;
 
-border:1px solid #ccc;
+            border-radius: 8px;
 
-border-radius:8px;
+            font-size: 14px;
 
-font-size:14px;
+        }
 
-}
+        .btn {
 
-.btn{
+            padding: 10px 20px;
 
-padding:10px 20px;
+            border: none;
 
-border:none;
+            border-radius: 8px;
 
-border-radius:8px;
+            cursor: pointer;
 
-cursor:pointer;
+            color: white;
 
-color:white;
+            font-weight: bold;
 
-font-weight:bold;
+            transition: .3s;
 
-transition:.3s;
+        }
 
-}
+        .btn:hover {
 
-.btn:hover{
+            opacity: .9;
 
-opacity:.9;
+        }
 
-}
+        .btn-buscar {
 
-.btn-buscar{
+            background: #7b1e3d;
 
-background:#7b1e3d;
+        }
 
-}
+        .btn-imprimir {
 
-.btn-imprimir{
+            background: #198754;
 
-background:#198754;
+        }
 
-}
+        .tabla {
 
-.tabla{
+            width: 100%;
 
-width:100%;
+            border-collapse: collapse;
 
-border-collapse:collapse;
+        }
 
-}
+        .tabla th {
 
-.tabla th{
+            background: #7b1e3d;
 
-background:#7b1e3d;
+            color: white;
 
-color:white;
+            padding: 12px;
 
-padding:12px;
+        }
 
-}
+        .tabla td {
 
-.tabla td{
+            padding: 10px;
 
-padding:10px;
+            border-bottom: 1px solid #ddd;
 
-border-bottom:1px solid #ddd;
+        }
 
-}
+        .estado {
 
-.estado{
+            display: inline-block;
 
-display:inline-block;
+            width: 150px;
 
-width:150px;
+            padding: 8px;
 
-padding:8px;
+            border-radius: 20px;
 
-border-radius:20px;
+            text-align: center;
 
-text-align:center;
+            font-size: 12px;
 
-font-size:12px;
+            font-weight: bold;
 
-font-weight:bold;
+            color: white;
 
-color:white;
-
-}
-
-</style>
+        }
+    </style>
 
 </head>
 
 <body>
+    <nav class="navbar">
+        <div class="navbar-brand">UNJFSC <span>| Mesa de Partes</span></div>
+        <div class="nav-links">
+            <a href="../principal_mesa.php">Bandeja de Trámites</a>
 
-<div class="container">
+            <div class="dropdown">
+                <a class="dropbtn active">Gestión ▼</a>
+                <div class="dropdown-content">
+                    <a href="../tramites/ver_tramites.php">Búsqueda de Trámites</a>
+                    <a href="reporte_fecha.php" class="active">Reportes por Fecha</a>
+                    <a href="../mesa_ayuda_mesa.php">Mesa de Ayuda</a>
+                </div>
+            </div>
 
-<div class="panel">
+            <a href="../cerrar_session_mesa.php" class="btn-logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+    <div class="container">
 
-<h2 class="panel-title">
+        <div class="panel">
 
-Reporte por Fechas
+            <h2 class="panel-title">
 
-</h2>
+                Reporte por Fechas
 
-<p style="margin-bottom:20px;">
+            </h2>
 
-Consulte los trámites registrados dentro de un rango de fechas.
+            <p style="margin-bottom:20px;">
 
-</p>
+                Consulte los trámites registrados dentro de un rango de fechas.
 
-<form method="GET">
+            </p>
 
-<div class="filtros">
+            <form method="GET">
 
-<div>
+                <div class="filtros">
 
-<label>
+                    <div>
 
-Fecha Inicio
+                        <label>
 
-</label>
+                            Fecha Inicio
 
-<input
+                        </label>
 
-type="date"
+                        <input type="date" name="fecha_inicio" class="form-control" value="<?php echo $fechaInicio; ?>"
+                            required>
 
-name="fecha_inicio"
+                    </div>
 
-class="form-control"
+                    <div>
 
-value="<?php echo $fechaInicio;?>"
+                        <label>
 
-required>
+                            Fecha Fin
 
-</div>
+                        </label>
 
-<div>
+                        <input type="date" name="fecha_fin" class="form-control" value="<?php echo $fechaFin; ?>"
+                            required>
 
-<label>
+                    </div>
 
-Fecha Fin
+                    <div style="display:flex;align-items:end;">
 
-</label>
+                        <button type="submit" name="buscar" class="btn btn-buscar">
 
-<input
+                            Buscar
 
-type="date"
+                        </button>
 
-name="fecha_fin"
+                    </div>
 
-class="form-control"
+                </div>
 
-value="<?php echo $fechaFin;?>"
+                <table class="tabla">
 
-required>
+                    <thead>
 
-</div>
+                        <tr>
 
-<div style="display:flex;align-items:end;">
+                            <th>Expediente</th>
 
-<button
+                            <th>Correo</th>
 
-type="submit"
+                            <th>Tipo Trámite</th>
 
-name="buscar"
+                            <th>Asunto</th>
 
-class="btn btn-buscar">
+                            <th>Área</th>
 
-Buscar
+                            <th>Estado</th>
 
-</button>
+                            <th>Fecha</th>
 
-</div>
+                        </tr>
 
-</div>
+                    </thead>
 
-<table class="tabla">
+                    <tbody>
 
-<thead>
+                        <?php
 
-<tr>
+                        if (mysqli_num_rows($resultado) > 0) {
 
-<th>Expediente</th>
+                            while ($fila = mysqli_fetch_assoc($resultado)) {
 
-<th>Correo</th>
+                                $color = "#ffc107";
 
-<th>Tipo Trámite</th>
+                                switch ($fila["nombre_estado"]) {
 
-<th>Asunto</th>
+                                    case "Pendiente":
+                                        $color = "#ffc107";
+                                        break;
 
-<th>Área</th>
+                                    case "En Revisión":
+                                        $color = "#0d6efd";
+                                        break;
 
-<th>Estado</th>
+                                    case "Derivado":
+                                        $color = "#198754";
+                                        break;
 
-<th>Fecha</th>
+                                    case "Observado/Rechazado":
+                                        $color = "#dc3545";
+                                        break;
 
-</tr>
+                                    case "Atendido/Finalizado":
+                                        $color = "#6f42c1";
+                                        break;
 
-</thead>
+                                }
 
-<tbody>
+                                ?>
 
-<?php
+                                <tr>
 
-if(mysqli_num_rows($resultado)>0)
-{
+                                    <td>
 
-while($fila=mysqli_fetch_assoc($resultado))
-{
+                                        <?php echo htmlspecialchars($fila["numero_expediente"]); ?>
 
-$color="#ffc107";
+                                    </td>
 
-switch($fila["nombre_estado"])
-{
+                                    <td>
 
-case "Pendiente":
-$color="#ffc107";
-break;
+                                        <?php echo htmlspecialchars($fila["correo"]); ?>
 
-case "En Revisión":
-$color="#0d6efd";
-break;
+                                    </td>
 
-case "Derivado":
-$color="#198754";
-break;
+                                    <td>
 
-case "Observado/Rechazado":
-$color="#dc3545";
-break;
+                                        <?php echo htmlspecialchars($fila["nombre_tramite"]); ?>
 
-case "Atendido/Finalizado":
-$color="#6f42c1";
-break;
+                                    </td>
 
-}
+                                    <td>
 
-?>
+                                        <?php echo htmlspecialchars($fila["asunto"]); ?>
 
-<tr>
+                                    </td>
 
-<td>
+                                    <td>
 
-<?php echo htmlspecialchars($fila["numero_expediente"]);?>
+                                        <?php echo htmlspecialchars($fila["nombre_oficina"]); ?>
 
-</td>
+                                    </td>
 
-<td>
+                                    <td>
 
-<?php echo htmlspecialchars($fila["correo"]);?>
+                                        <span class="estado" style="background:<?php echo $color; ?>;">
 
-</td>
+                                            <?php echo htmlspecialchars($fila["nombre_estado"]); ?>
 
-<td>
+                                        </span>
 
-<?php echo htmlspecialchars($fila["nombre_tramite"]);?>
+                                    </td>
 
-</td>
+                                    <td>
 
-<td>
+                                        <?php
 
-<?php echo htmlspecialchars($fila["asunto"]);?>
+                                        echo date(
 
-</td>
+                                            "d/m/Y H:i",
 
-<td>
+                                            strtotime($fila["fecha_envio"])
 
-<?php echo htmlspecialchars($fila["nombre_oficina"]);?>
+                                        );
 
-</td>
+                                        ?>
 
-<td>
+                                    </td>
 
-<span
-class="estado"
-style="background:<?php echo $color;?>;">
+                                </tr>
 
-<?php echo htmlspecialchars($fila["nombre_estado"]);?>
+                                <?php
 
-</span>
+                            }
 
-</td>
+                        } else {
 
-<td>
+                            ?>
 
-<?php
+                            <tr>
 
-echo date(
+                                <td colspan="7" style="text-align:center;padding:30px;color:#777;">
 
-"d/m/Y H:i",
+                                    No existen trámites registrados para el rango de fechas seleccionado.
 
-strtotime($fila["fecha_envio"])
+                                </td>
 
-);
+                            </tr>
 
-?>
+                            <?php
 
-</td>
+                        }
 
-</tr>
+                        ?>
 
-<?php
+                    </tbody>
 
-}
+                </table>
 
-}
-else
-{
+                <br>
 
-?>
+                <div style="display:flex;justify-content:flex-end;gap:10px;">
 
-<tr>
+                    <button type="button" class="btn btn-imprimir" onclick="window.print();">
 
-<td
-colspan="7"
-style="text-align:center;padding:30px;color:#777;">
+                        🖨 Imprimir Reporte
 
-No existen trámites registrados para el rango de fechas seleccionado.
+                    </button>
 
-</td>
+                </div>
 
-</tr>
+        </div>
 
-<?php
-
-}
-
-?>
-
-</tbody>
-
-</table>
-
-<br>
-
-<div style="display:flex;justify-content:flex-end;gap:10px;">
-
-<button
-
-type="button"
-
-class="btn btn-imprimir"
-
-onclick="window.print();">
-
-🖨 Imprimir Reporte
-
-</button>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </body>
 
