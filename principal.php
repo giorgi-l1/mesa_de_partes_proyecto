@@ -118,7 +118,13 @@ if ($res_stats) {
                     <a href="cambiar_password.php">Cambiar Contraseña</a>
                 </div>
             </div>
-            <a href="mesa_ayuda.php" class="active">Mesa de Ayuda</a>
+            <div class="dropdown">
+                <a class="dropbtn">Mesa de Ayuda ▼</a>
+                <div class="dropdown-content">
+                    <a href="mesa_ayuda.php">Registrar Reclamo / Ticket</a>
+                    <a href="detalle_queja_usuario.php">Visualizar mis Reclamos</a>
+                </div>
+            </div>
             <a href="cerrar_session.php" class="btn-logout">Cerrar Sesión</a>
         </div>
     </nav>
