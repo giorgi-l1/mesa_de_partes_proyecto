@@ -118,7 +118,7 @@ if ($res_stats) {
                     <a href="cambiar_password.php">Cambiar Contraseña</a>
                 </div>
             </div>
-
+            <a href="mesa_ayuda.php" class="active">Mesa de Ayuda</a>
             <a href="cerrar_session.php" class="btn-logout">Cerrar Sesión</a>
         </div>
     </nav>
@@ -189,6 +189,7 @@ if ($res_stats) {
                                     <th>Tipo de Documento</th>
                                     <th>Fecha Envío</th>
                                     <th>Estado</th>
+                                    <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -222,16 +223,17 @@ if ($res_stats) {
                                         $fecha_formateada = date("d/m/Y H:i", strtotime($tramite['fecha_envio']));
 
                                         echo "<tr>";
-                                        echo "<td><strong>" . $tramite['numero_expediente'] . "</strong></td>"; // Mostramos el EXP real
-                                        echo "<td>" . $tramite['nombre_tipo'] . "</td>";
+                                        echo "<td><a href='ver_detalle.php?id=" . $tramite['id_tramite'] . "' style='color: var(--azul-institucional); font-weight: 700; text-decoration: none;'>" . $tramite['numero_expediente'] . "</a></td>";
+                                        echo "<td>" . $tramite['nombre_tramite'] . "</td>";
                                         echo "<td>" . $fecha_formateada . "</td>";
                                         echo "<td><span class='status-badge $clase_badge'>" . $tramite['nombre_estado'] . "</span></td>";
+                                        echo "<td><a href='ver_detalle.php?id=" . $tramite['id_tramite'] . "' class='btn-ver-detalle'>Ver detalle</a></td>";
                                         echo "</tr>";
                                     }
                                 } else {
                                     // Si no hay trámites, mostramos un mensaje bonito
                                     echo "<tr>
-                                            <td colspan='4' style='text-align: center; color: #888; padding: 30px;'>
+                                            <td colspan='5' style='text-align: center; color: #888; padding: 30px;'>
                                                 <div style='font-size: 2.5rem; margin-bottom: 10px;'>📂</div>
                                                 <em>Aún no has enviado ningún trámite.</em><br>
                                                 <a href='nuevo_tramite.php' style='color: var(--dorado-arena); font-weight:600; text-decoration:none;'>Inicia tu primer trámite aquí</a>

@@ -23,10 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // -------------------------------------------------------------
         // VALIDACIÓN ESTRICTA: Solo entran Administradores/Mesa de partes
-        // OJO: Cambia el "5" por el id_tipo real de tu base de datos 
-        // que corresponda al personal de Mesa de Partes.
+        // id_tipo = 3 corresponde a "Personal / Oficina" en tipos_usuario
         // -------------------------------------------------------------
-        if ($usuario['id_tipo'] != 5) {
+        if ($usuario['id_tipo'] != 3) {
             header("Location: login_mesa.php?error=user");
             exit();
         }

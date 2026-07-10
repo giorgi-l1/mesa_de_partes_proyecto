@@ -72,11 +72,34 @@ tr:hover { background-color: #f9f9f9; }
 .status-atendido { background: #d4edda; color: #155724; }
 
 /* FORMULARIOS (Para Perfil y Nuevo Trámite) */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.form-group { display: flex; flex-direction: column; }
+.form-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+    width: 100%; 
+}
+.form-group { 
+    display: flex; 
+    flex-direction: column; 
+    min-width: 0; 
+    width: 100%; 
+}
 .form-group.full-width { grid-column: span 2; }
 .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--azul-oscuro); margin-bottom: 8px; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; transition: border 0.3s; background: white; font-family: 'Montserrat', sans-serif;}
+.form-group input, 
+.form-group select, 
+.form-group textarea { 
+    width: 100%; 
+    max-width: 100%; 
+    box-sizing: border-box; 
+    padding: 12px; 
+    border: 1px solid #ccc; 
+    border-radius: 6px; 
+    font-size: 1rem; 
+    transition: border 0.3s; 
+    background: white; 
+    font-family: 'Montserrat', sans-serif; 
+}
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--dorado-arena); outline: none; }
 input[readonly] { background-color: #e9ecef; color: #6c757d; border: 1px dashed #adb5bd; cursor: not-allowed; }
 .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500; }
@@ -132,3 +155,287 @@ input[readonly] { background-color: #e9ecef; color: #6c757d; border: 1px dashed 
 .dropdown:hover .dropdown-content {
     display: block;
 }
+
+/* =========================================
+   VISTA: DETALLE DEL TRÁMITE (ver_detalle.php)
+========================================= */
+.status-pendiente { background: #fff3cd; color: #856404; }
+.status-derivado { background: #e2d9f3; color: #4b2e83; }
+.status-observado { background: #f8d7da; color: #721c24; }
+
+.detalle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 30px 0 20px 0;
+}
+.btn-volver {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: 10px;
+    transition: color 0.2s;
+}
+.btn-volver:hover { color: var(--dorado-arena); }
+.detalle-titulo {
+    font-family: 'Playfair Display', serif;
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+}
+.detalle-subtitulo { color: #d8d8d8; font-size: 0.95rem; }
+.detalle-header-acciones {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+.btn-pdf { width: auto; padding: 12px 22px; margin-bottom: 0; white-space: nowrap; }
+
+.detalle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.detalle-item { display: flex; flex-direction: column; min-width: 0; }
+.detalle-item.full-width { grid-column: span 2; }
+.detalle-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--azul-institucional);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+.detalle-valor { color: #333; font-size: 0.95rem; line-height: 1.5; }
+.detalle-observacion {
+    background: #fff3cd;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #ffc107;
+}
+
+.sin-datos { color: #888; font-style: italic; padding: 15px 0; }
+
+.lista-adjuntos { list-style: none; }
+.adjunto-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 10px;
+    border-bottom: 1px solid #eee;
+}
+.adjunto-item:last-child { border-bottom: none; }
+.adjunto-icono { font-size: 1.5rem; }
+.adjunto-info { display: flex; flex-direction: column; flex-grow: 1; }
+.adjunto-fecha { font-size: 0.8rem; color: #777; margin-top: 2px; }
+.adjunto-descarga {
+    background: var(--azul-institucional);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+.adjunto-descarga:hover { background: var(--dorado-arena); }
+
+.timeline { position: relative; padding-left: 25px; }
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: #ddd;
+}
+.timeline-item { position: relative; padding-bottom: 25px; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-punto {
+    position: absolute;
+    left: -25px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--dorado-arena);
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--dorado-arena);
+}
+.timeline-cabecera {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.timeline-cabecera strong { color: var(--azul-oscuro); }
+.timeline-fecha { color: #888; font-size: 0.8rem; }
+.timeline-ruta { font-size: 0.9rem; color: #333; margin-bottom: 4px; }
+.timeline-estado { font-size: 0.85rem; color: #555; margin-bottom: 4px; }
+.timeline-obs {
+    font-size: 0.85rem;
+    color: #555;
+    background: var(--fondo-gris);
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+.timeline-recepcion { font-size: 0.8rem; color: #198754; margin-top: 6px; font-weight: 500; }
+
+@media (max-width: 700px) {
+    .detalle-grid { grid-template-columns: 1fr; }
+    .detalle-item.full-width { grid-column: span 1; }
+}
+
+.btn-ver-detalle {
+    display: inline-block;
+    background: var(--azul-institucional);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.btn-ver-detalle:hover { background: var(--dorado-arena); }
+
+/* =========================================
+   VISTA: MIS TRÁMITES (mis_tramites.php) - PAGINACIÓN
+========================================= */
+.paginacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+.paginacion-info { color: #777; font-size: 0.85rem; }
+.paginacion-controles { display: flex; flex-wrap: wrap; gap: 6px; }
+.pagina-btn {
+    display: inline-block;
+    padding: 7px 13px;
+    border-radius: 6px;
+    background: var(--fondo-gris);
+    color: var(--azul-institucional);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+}
+.pagina-btn:hover { background: var(--azul-institucional); color: white; }
+.pagina-activa { background: var(--azul-institucional); color: white; }
+.pagina-disabled { background: #f1f1f1; color: #ccc; cursor: not-allowed; }
+.pagina-disabled:hover { background: #f1f1f1; color: #ccc; }
+
+/* =========================================
+   VISTA: PANEL DE GESTIÓN Y DERIVACIÓN (Rol Oficina)
+========================================= */
+.nav-info-oficina {
+    color: #d8d8d8;
+    font-size: 0.85rem;
+    margin-left: auto;
+    margin-right: 20px;
+    white-space: nowrap;
+}
+.panel-subtitulo { color: #777; font-size: 0.9rem; margin: 6px 0 18px 0; }
+.pill-cargo {
+    background: var(--fondo-gris);
+    color: var(--azul-institucional);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.mensaje-flash {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.mensaje-exito { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.mensaje-error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+
+.col-descripcion { max-width: 260px; }
+.col-acciones { white-space: nowrap; }
+
+.btn-icono-pdf {
+    display: inline-block;
+    font-size: 1.2rem;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.btn-accion {
+    display: inline-block;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin: 2px;
+    color: white;
+    transition: opacity 0.2s;
+}
+.btn-accion:hover { opacity: 0.85; }
+.btn-finalizar { background: #198754; }
+.btn-derivar { background: #b8860b; }
+
+/* --- MODAL DE DERIVACIÓN --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(6, 40, 71, 0.6);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+}
+.modal-box {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+    border-top: 4px solid var(--dorado-arena);
+}
+.modal-box h3 { color: var(--azul-oscuro); font-family: 'Playfair Display', serif; margin-bottom: 6px; }
+.modal-expediente { color: #777; font-size: 0.85rem; margin-bottom: 18px; }
+.form-group-modal { margin-bottom: 16px; display: flex; flex-direction: column; }
+.form-group-modal label { font-size: 0.82rem; font-weight: 600; color: var(--azul-institucional); margin-bottom: 6px; }
+.form-group-modal select,
+.form-group-modal textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    resize: vertical;
+}
+.modal-acciones { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+.btn-modal-cancelar, .btn-modal-confirmar {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.btn-modal-cancelar { background: var(--fondo-gris); color: #555; }
+.btn-modal-confirmar { background: var(--azul-institucional); color: white; }
+.btn-modal-confirmar:hover { background: var(--dorado-arena); }
