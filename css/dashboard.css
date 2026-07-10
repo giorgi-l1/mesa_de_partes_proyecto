@@ -439,3 +439,31 @@ input[readonly] { background-color: #e9ecef; color: #6c757d; border: 1px dashed 
 .btn-modal-cancelar { background: var(--fondo-gris); color: #555; }
 .btn-modal-confirmar { background: var(--azul-institucional); color: white; }
 .btn-modal-confirmar:hover { background: var(--dorado-arena); }
+
+/* =========================================
+   ESTILOS NORMALIZADOS DE LA BANDEJA
+========================================= */
+.panel-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.panel-title-clean {
+    border: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.form-inline {
+    display: inline;
+}
+.tabla-vacia {
+    text-align: center;
+    color: #888;
+    padding: 30px;
+}
+.tabla-vacia-icono {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}

@@ -47,9 +47,6 @@ if (isset($_GET['ok']) && $_GET['ok'] == 'finalizado') {
 } elseif (isset($_GET['ok']) && $_GET['ok'] == 'derivado') {
     $mensaje = "El trámite fue derivado a la nueva área correctamente.";
     $tipo_mensaje = "exito";
-} elseif (isset($_GET['ok']) && $_GET['ok'] == 'rechazado') {
-    $mensaje = "El trámite fue rechazado y retirado de la bandeja correctamente.";
-    $tipo_mensaje = "exito";
 } elseif (isset($_GET['error'])) {
     $mensaje = "Ocurrió un problema al procesar la acción. Intenta nuevamente.";
     $tipo_mensaje = "error";
@@ -66,9 +63,9 @@ if ($pagina_actual < 1) {
 $offset = ($pagina_actual - 1) * $por_pagina;
 
 // ----------------------------------------------------
-// 4. TOTAL DE TRÁMITES (Se excluyen estados 5 y 4)
+// 4. TOTAL DE TRÁMITES EN LA BANDEJA DE ESTA OFICINA
 // ----------------------------------------------------
-$query_total = "SELECT COUNT(*) AS total FROM tramites WHERE id_oficina_actual = '$id_oficina' AND id_estado != 5 AND id_estado != 4";
+$query_total = "SELECT COUNT(*) AS total FROM tramites WHERE id_oficina_actual = '$id_oficina' AND id_estado != 5";
 $res_total = mysqli_query($cn, $query_total);
 $total_tramites = 0;
 if ($res_total && $fila_total = mysqli_fetch_assoc($res_total)) {
@@ -81,7 +78,7 @@ if ($pagina_actual > $total_paginas) {
 }
 
 // ----------------------------------------------------
-// 5. LISTADO DE TRÁMITES (Se excluyen estados 5 y 4)
+// 5. LISTADO DE TRÁMITES DE LA BANDEJA
 // ----------------------------------------------------
 $query_bandeja = "SELECT t.id_tramite, t.numero_expediente, t.asunto, t.descripcion_motivo, t.fecha_envio,
                           e.nombre_estado,
@@ -96,7 +93,7 @@ $query_bandeja = "SELECT t.id_tramite, t.numero_expediente, t.asunto, t.descripc
                    INNER JOIN oficinas o ON t.id_oficina_actual = o.id_oficina
                    LEFT JOIN datos_personales dp ON t.id_usuario = dp.id_usuario
                    LEFT JOIN datos_juridicos dj ON t.id_usuario = dj.id_usuario
-                   WHERE t.id_oficina_actual = '$id_oficina' AND t.id_estado != 5 AND t.id_estado != 4
+                   WHERE t.id_oficina_actual = '$id_oficina' AND t.id_estado != 5
                    ORDER BY t.fecha_envio ASC
                    LIMIT $por_pagina OFFSET $offset";
 $res_bandeja = mysqli_query($cn, $query_bandeja);
@@ -129,19 +126,20 @@ if ($res_oficinas) {
 <body>
 
     <nav class="navbar">
-        <div class="navbar-brand">UNJFSC <span>| Mesa de Partes</span></div>
+        <div class="navbar-brand">UNJFSC <span>| Oficinas</span></div>
         <div class="nav-links">
-            <a href="principal_mesa.php" class="active">Bandeja de Trámites</a>
+            <a href="principal_oficina.php" class="active">Bandeja de Trámites</a>
 
+            <!-- Menú Desplegable de Gestión (Oficinas y Reportes) -->
             <div class="dropdown">
                 <a class="dropbtn">Gestión ▼</a>
                 <div class="dropdown-content">
-                    <a href="tramites/ver_tramites.php">Búsqueda de Trámites</a>
+                    <a href="oficinas/oficinas_listar.php">Listar Oficinas</a>
                     <a href="reporte/reporte_fecha.php">Reportes por Fecha</a>
-                    <a href="mesa_ayuda_mesa.php">Mesa de Ayuda</a>
                 </div>
             </div>
 
+            <!-- Información de la Oficina del Trabajador -->
             <span class="nav-info-oficina">
                 🏢 <?php echo htmlspecialchars($staff['nombre_oficina']); ?>
                 (<?php echo htmlspecialchars($staff['siglas']); ?>)
@@ -155,6 +153,7 @@ if ($res_oficinas) {
     <div class="container">
 
         <div class="panel">
+            <!-- Limpieza de estilos aplicados en el header -->
             <div class="panel-header-flex">
                 <h2 class="panel-title panel-title-clean">
                     Bandeja de <?php echo htmlspecialchars($staff['nombre_oficina']); ?>
@@ -179,7 +178,9 @@ if ($res_oficinas) {
                             <th>DESCRIPCION</th>
                             <th>AREA</th>
                             <th>PDF</th>
-                            <th>ACCIONES</th>
+                            <?php if ($puede_finalizar || $puede_derivar): ?>
+                                <th>ACCIONES</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -204,33 +205,29 @@ if ($res_oficinas) {
                                         <a href="mesa_exportar_pdf.php?id=<?php echo $t['id_tramite']; ?>" target="_blank"
                                             class="btn-icono-pdf" title="Ver constancia en PDF">📄</a>
                                     </td>
-                                    <td class="col-acciones">
-                                        <?php if ($puede_finalizar): ?>
-                                            <form action="oficina_finalizar_tramite.php" method="POST"
-                                                onsubmit="return confirm('¿Confirmas que el trámite <?php echo htmlspecialchars($t['numero_expediente']); ?> ha concluido su gestión?');"
-                                                class="form-inline">
-                                                <input type="hidden" name="id_tramite" value="<?php echo $t['id_tramite']; ?>">
-                                                <button type="submit" class="btn-accion btn-finalizar">Finalizar</button>
-                                            </form>
-                                        <?php endif; ?>
-                                        <?php if ($puede_derivar): ?>
-                                            <button type="button" class="btn-accion btn-derivar"
-                                                onclick="abrirModalDerivar('<?php echo $t['id_tramite']; ?>', '<?php echo htmlspecialchars($t['numero_expediente'], ENT_QUOTES); ?>')">
-                                                Enviar a otra área
-                                            </button>
-                                        <?php endif; ?>
-                                        
-                                        <a href="tramites/rechazar_tramite.php?id=<?php echo $t['id_tramite']; ?>" 
-                                           onclick="return confirm('¿Estás completamente seguro de rechazar el expediente <?php echo htmlspecialchars($t['numero_expediente'], ENT_QUOTES); ?>?');" 
-                                           class="btn-accion" 
-                                           style="background-color: #dc3545; color: white; text-decoration: none; display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-left: 5px;">
-                                            Rechazar
-                                        </a>
-                                    </td>
+                                    <?php if ($puede_finalizar || $puede_derivar): ?>
+                                        <td class="col-acciones">
+                                            <?php if ($puede_finalizar): ?>
+                                                <form action="oficina_finalizar_tramite.php" method="POST"
+                                                    onsubmit="return confirm('¿Confirmas que el trámite <?php echo htmlspecialchars($t['numero_expediente']); ?> ha concluido su gestión?');"
+                                                    class="form-inline">
+                                                    <input type="hidden" name="id_tramite" value="<?php echo $t['id_tramite']; ?>">
+                                                    <button type="submit" class="btn-accion btn-finalizar">Finalizar</button>
+                                                </form>
+                                            <?php endif; ?>
+                                            <?php if ($puede_derivar): ?>
+                                                <button type="button" class="btn-accion btn-derivar"
+                                                    onclick="abrirModalDerivar('<?php echo $t['id_tramite']; ?>', '<?php echo htmlspecialchars($t['numero_expediente'], ENT_QUOTES); ?>')">
+                                                    Enviar a otra área
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+                                    <?php endif; ?>
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
+                                <!-- Uso de las nuevas clases para tabla vacía -->
                                 <td colspan="8" class="tabla-vacia">
                                     <div class="tabla-vacia-icono">📭</div>
                                     <em>No hay trámites pendientes en la bandeja de tu oficina.</em>
@@ -275,6 +272,9 @@ if ($res_oficinas) {
     </div>
 
     <?php if ($puede_derivar): ?>
+        <!-- =========================================
+         MODAL: SELECTOR DE ÁREA DE DESTINO
+    ========================================== -->
         <div id="modalDerivar" class="modal-overlay" style="display:none;">
             <div class="modal-box">
                 <h3>Enviar trámite a otra área</h3>
@@ -327,4 +327,5 @@ if ($res_oficinas) {
     <?php endif; ?>
 
 </body>
+
 </html>
