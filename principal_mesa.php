@@ -280,7 +280,7 @@ if ($res_oficinas) {
                 <h3>Enviar trámite a otra área</h3>
                 <p class="modal-expediente">Expediente: <strong id="modalExpedienteTexto"></strong></p>
 
-                <form action="oficina_derivar_tramite.php" method="POST">
+                <form action="mesa_derivar_tramite.php" method="POST">
                     <input type="hidden" name="id_tramite" id="modalIdTramite" value="">
 
                     <div class="form-group-modal">
