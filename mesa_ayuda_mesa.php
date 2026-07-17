@@ -139,7 +139,8 @@ $res_tickets = mysqli_query($cn, $query_tickets);
 
             <?php if ($mensaje_flash): ?>
                 <div class="mensaje-flash mensaje-<?php echo $tipo_mensaje; ?>">
-                    <?php echo htmlspecialchars($mensaje_flash); ?></div>
+                    <?php echo htmlspecialchars($mensaje_flash); ?>
+                </div>
             <?php endif; ?>
 
             <div class="table-container">
@@ -297,6 +298,96 @@ $res_tickets = mysqli_query($cn, $query_tickets);
         </div>
     </div>
 
+    <div id="chatbot-bubble" onclick="toggleChat()"
+        style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: #007bff; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 9999; transition: transform 0.2s;">
+        <span style="font-size: 30px; color: white;">🤖</span>
+    </div>
+
+    <div id="chatbot-window"
+        style="position: fixed; bottom: 90px; right: 20px; width: 320px; height: 400px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; z-index: 9999; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif;">
+        <!-- Encabezado -->
+        <div
+            style="background: #007bff; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+            <span>🤖 Asistente Virtual UNJFSC</span>
+            <button onclick="toggleChat()"
+                style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">✕</button>
+        </div>
+
+        <!-- Cuerpo del Chat -->
+        <div id="chat-body"
+            style="flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; gap: 10px;">
+            <div
+                style="background: #e9ecef; padding: 10px; border-radius: 8px; font-size: 13px; max-width: 85%; color: #333;">
+                ¡Hola! Soy tu asistente virtual. ¿En qué te puedo ayudar hoy de forma rápida?
+            </div>
+
+            <!-- Opciones Rápidas -->
+            <div id="chat-options" style="display: flex; flex-direction: column; gap: 5px; margin-top: 5px;">
+                <button onclick="botResponder('tramites')"
+                    style="background: white; border: 1px solid #007bff; color: #007bff; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; text-align: left; font-weight: 500; transition: 0.2s;">🔍
+                    Consultar / Buscar Trámites</button>
+                <button onclick="botResponder('ayuda')"
+                    style="background: white; border: 1px solid #007bff; color: #007bff; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; text-align: left; font-weight: 500; transition: 0.2s;">🎫
+                    Ir a Mesa de Ayuda</button>
+                <button onclick="botResponder('horario')"
+                    style="background: white; border: 1px solid #007bff; color: #007bff; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; text-align: left; font-weight: 500; transition: 0.2s;">🕒
+                    Horario de Atención</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
+
+
 </html>
+<script>
+function toggleChat() {
+    const windowChat = document.getElementById('chatbot-window');
+    const bubble = document.getElementById('chatbot-bubble');
+    if (windowChat.style.display === 'none' || windowChat.style.display === '') {
+        windowChat.style.display = 'flex';
+        bubble.style.transform = 'scale(0.9)';
+    } else {
+        windowChat.style.display = 'none';
+        bubble.style.transform = 'scale(1)';
+    }
+}
+
+function botResponder(opcion) {
+    const chatBody = document.getElementById('chat-body');
+    const optionsDiv = document.getElementById('chat-options');
+    
+    // Ocultar opciones temporales para simular flujo
+    optionsDiv.style.display = 'none';
+    
+    let respuestaTexto = "";
+    let botonAccion = "";
+
+    if (opcion === 'tramites') {
+        respuestaTexto = "Para buscar, revisar y hacer seguimiento a los expedientes del sistema, puedes ir directamente al buscador de trámites.";
+        botonAccion = `<a href="tramites/ver_tramites.php" style="display:inline-block; background:#007bff; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Ir a Búsqueda de Trámites ➡️</a>`;
+    } else if (opcion === 'ayuda') {
+        respuestaTexto = "Si tienes inconvenientes, quejas o reclamos con alguna solicitud, nuestra Mesa de Ayuda está disponible para atenderte.";
+        botonAccion = `<a href="mesa_ayuda_mesa.php" style="display:inline-block; background:#28a745; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Ir a Mesa de Ayuda ➡️</a>`;
+    } else if (opcion === 'horario') {
+        respuestaTexto = "🏢 El horario de atención presencial y virtual de la Unidad de Trámite Documentario es de Lunes a Viernes de 08:00 AM a 04:00 PM.";
+    }
+
+    // Insertar respuesta del bot
+    setTimeout(() => {
+        chatBody.innerHTML += `
+            <div style="background: #e9ecef; padding: 10px; border-radius: 8px; font-size: 13px; max-width: 85%; color: #333; margin-top: 5px;">
+                ${respuestaTexto}<br>${botonAccion}
+            </div>
+        `;
+        
+        // Volver a mostrar las opciones abajo por si quiere consultar otra cosa
+        optionsDiv.style.display = 'flex';
+        chatBody.appendChild(optionsDiv);
+        
+        // Auto-scroll al fondo
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }, 400);
+}
+</script>

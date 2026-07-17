@@ -256,7 +256,89 @@ if ($res_stats) {
             </div>
         </div>
     </div>
+    <div id="chatbot-bubble" onclick="toggleChat()"
+        style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: #791518; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 9999; transition: transform 0.2s;">
+        <span style="font-size: 30px; color: white;">🤖</span>
+    </div>
 
+    <div id="chatbot-window"
+        style="position: fixed; bottom: 90px; right: 20px; width: 320px; height: 400px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; z-index: 9999; border: 1px solid #ddd; font-family: 'Montserrat', sans-serif;">
+        <!-- Encabezado -->
+        <div
+            style="background: #791518; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+            <span>🤖 Asistente Virtual UNJFSC</span>
+            <button onclick="toggleChat()"
+                style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">✕</button>
+        </div>
+
+        <!-- Cuerpo del Chat -->
+        <div id="chat-body"
+            style="flex: 1; padding: 15px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; gap: 10px;">
+            <div
+                style="background: #e9ecef; padding: 10px; border-radius: 8px; font-size: 13px; max-width: 85%; color: #333;">
+                ¡Hola! Soy tu asistente de la Mesa de Partes. ¿Qué deseas gestionar hoy?
+            </div>
+
+            <!-- Opciones Rápidas para el Usuario -->
+            <div id="chat-options" style="display: flex; flex-direction: column; gap: 5px; margin-top: 5px;">
+                <button onclick="botResponder('nuevo')"
+                    style="background: white; border: 1px solid #791518; color: #791518; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; text-align: left; font-weight: 500; transition: 0.2s;">🚀
+                    Iniciar un Nuevo Trámite</button>
+                <button onclick="botResponder('estado')"
+                    style="background: white; border: 1px solid #791518; color: #791518; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; text-align: left; font-weight: 500; transition: 0.2s;">🔍
+                    Ver Estado de Mis Trámites</button>
+                <button onclick="botResponder('reclamo')"
+                    style="background: white; border: 1px solid #791518; color: #791518; padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; text-align: left; font-weight: 500; transition: 0.2s;">🎫
+                    Registrar Reclamo / Ticket</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
+<script>
+function toggleChat() {
+    const windowChat = document.getElementById('chatbot-window');
+    const bubble = document.getElementById('chatbot-bubble');
+    if (windowChat.style.display === 'none' || windowChat.style.display === '') {
+        windowChat.style.display = 'flex';
+        bubble.style.transform = 'scale(0.9)';
+    } else {
+        windowChat.style.display = 'none';
+        bubble.style.transform = 'scale(1)';
+    }
+}
+
+function botResponder(opcion) {
+    const chatBody = document.getElementById('chat-body');
+    const optionsDiv = document.getElementById('chat-options');
+    
+    optionsDiv.style.display = 'none';
+    
+    let respuestaTexto = "";
+    let botonAccion = "";
+
+    if (opcion === 'nuevo') {
+        respuestaTexto = "Puedes registrar una nueva solicitud o adjuntar tus documentos del formato FUT directamente desde el módulo de registro.";
+        botonAccion = `<a href="nuevo_tramite.php" style="display:inline-block; background:#791518; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Iniciar Trámite ➡️</a>`;
+    } else if (opcion === 'estado') {
+        respuestaTexto = "Para revisar en qué oficina se encuentra tu expediente, los documentos adjuntos y sus observaciones, ingresa a tu bandeja.";
+        botonAccion = `<a href="mis_tramites.php" style="display:inline-block; background:#6c757d; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Mis Trámites ➡️</a>`;
+    } else if (opcion === 'reclamo') {
+        respuestaTexto = "Si tienes inconvenientes con el uso de la plataforma o alguna queja sobre tu atención, puedes abrir un ticket de soporte.";
+        botonAccion = `<a href="mesa_ayuda.php" style="display:inline-block; background:#ffc107; color:black; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Registrar Ticket ➡️</a>`;
+    }
+
+    setTimeout(() => {
+        chatBody.innerHTML += `
+            <div style="background: #e9ecef; padding: 10px; border-radius: 8px; font-size: 13px; max-width: 85%; color: #333; margin-top: 5px;">
+                ${respuestaTexto}<br>${botonAccion}
+            </div>
+        `;
+        
+        optionsDiv.style.display = 'flex';
+        chatBody.appendChild(optionsDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }, 400);
+}
+</script>
