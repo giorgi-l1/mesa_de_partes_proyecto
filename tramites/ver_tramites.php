@@ -1,11 +1,21 @@
 <?php
 session_start();
 
-// Validar que sea un administrador o personal de mesa de partes
-if (!isset($_SESSION["auth_mesa"]) || $_SESSION["auth_mesa"] != "1") {
-    header("Location: ../login_mesa.php");
+// 1. Verificamos si es Mesa de Partes
+$es_mesa = (isset($_SESSION["auth_mesa"]) && $_SESSION["auth_mesa"] == "1");
+
+// 2. Verificamos si es una Oficina (Ajusta "id_oficina" por la variable de sesión exacta que uses en tu login de oficinas)
+$es_oficina = isset($_SESSION["id_oficina"]); 
+
+// 3. Si no es NINGUNO de los dos, lo expulsamos
+if (!$es_mesa && !$es_oficina) {
+    // Lo mandamos al index principal o login general
+    header("Location: ../index.php"); 
     exit();
 }
+
+include("../conexion.php");
+
 
 require '../conexion.php';
 
@@ -48,17 +58,31 @@ if (count($where_clauses) > 0) {
 // ----------------------------------------------------
 // 3. CONSULTA PRINCIPAL
 // ----------------------------------------------------
-$sql = "SELECT t.id_tramite, t.numero_expediente, u.correo, u.id_tipo, tt.nombre_tramite, 
+// --- LÓGICA DE PAGINACIÓN ---
+$registros_por_pagina = 40;
+$pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+$offset = ($pagina_actual - 1) * $registros_por_pagina;
+
+// Contar total de registros para los botones
+$sql_count = "SELECT COUNT(*) as total FROM tramites t 
+              INNER JOIN usuarios u ON t.id_usuario = u.id_usuario 
+              $where_sql";
+$total_registros = mysqli_fetch_assoc(mysqli_query($cn, $sql_count))['total'];
+$total_paginas = ceil($total_registros / $registros_por_pagina);
+
+// Consulta final con LIMIT y OFFSET
+// Reemplaza tu SELECT actual con este:
+$sql = "SELECT t.id_tramite, t.numero_expediente, u.correo, tu.nombre_tipo as txt_tipo, tt.nombre_tramite, 
                t.asunto, o.nombre_oficina, e.nombre_estado, t.fecha_envio
         FROM tramites t
         INNER JOIN usuarios u ON t.id_usuario = u.id_usuario
+        INNER JOIN tipos_usuario tu ON u.id_tipo = tu.id_tipo
         INNER JOIN tipos_tramite tt ON t.id_tipo_tramite = tt.id_tipo_tramite
         INNER JOIN oficinas o ON t.id_oficina_actual = o.id_oficina
         INNER JOIN estados_tramite e ON t.id_estado = e.id_estado
         $where_sql
         ORDER BY t.fecha_envio DESC
-        LIMIT 100"; // Límite para no sobrecargar si no hay filtros
-
+        LIMIT $offset, $registros_por_pagina";
 $resultado = mysqli_query($cn, $sql);
 ?>
 
@@ -276,21 +300,13 @@ $resultado = mysqli_query($cn, $sql);
                                         $color = "#6f42c1";
                                         break;
                                 }
-
-                                // Etiqueta del tipo de usuario basado en id_tipo
-                                $txt_tipo = "Desconocido";
-                                if ($fila["id_tipo"] == 1)
-                                    $txt_tipo = "Alumno";
-                                if ($fila["id_tipo"] == 2)
-                                    $txt_tipo = "Docente/Pers.";
-                                if ($fila["id_tipo"] == 3)
-                                    $txt_tipo = "Egresado";
-                                if ($fila["id_tipo"] == 4)
-                                    $txt_tipo = "Inst. Externa";
                                 ?>
                                 <tr>
                                     <td><strong><?php echo htmlspecialchars($fila["numero_expediente"]); ?></strong></td>
-                                    <td><span class="tipo-badge"><?php echo $txt_tipo; ?></span></td>
+
+                                    <!-- AQUÍ ESTÁ LA CORRECCIÓN: El dato va directo dentro del <td> -->
+                                    <td><span class="tipo-badge"><?php echo htmlspecialchars($fila["txt_tipo"]); ?></span></td>
+
                                     <td><?php echo htmlspecialchars($fila["correo"]); ?></td>
                                     <td><?php echo htmlspecialchars($fila["nombre_tramite"]); ?></td>
                                     <td><?php echo htmlspecialchars($fila["asunto"]); ?></td>
@@ -312,6 +328,23 @@ $resultado = mysqli_query($cn, $sql);
                         <?php endif; ?>
                     </tbody>
                 </table>
+                <div class="paginacion">
+                    <span class="paginacion-info">
+                        Mostrando página <?php echo $pagina_actual; ?> de
+                        <?php echo $total_paginas > 0 ? $total_paginas : 1; ?>
+                    </span>
+                    <div class="paginacion-controles">
+                        <?php if ($pagina_actual > 1): ?>
+                            <a href="?pagina=<?php echo $pagina_actual - 1; ?>&termino=<?php echo $busqueda; ?>&tipo_usuario=<?php echo $filtro_tipo; ?>&id_oficina=<?php echo $filtro_oficina; ?>"
+                                class="pagina-btn">Anterior</a>
+                        <?php endif; ?>
+
+                        <?php if ($pagina_actual < $total_paginas): ?>
+                            <a href="?pagina=<?php echo $pagina_actual + 1; ?>&termino=<?php echo $busqueda; ?>&tipo_usuario=<?php echo $filtro_tipo; ?>&id_oficina=<?php echo $filtro_oficina; ?>"
+                                class="pagina-btn">Siguiente</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
 
         </div>

@@ -1,5 +1,19 @@
 <?php
-//include("../auth.php");
+session_start();
+
+// 1. Verificamos si es Mesa de Partes
+$es_mesa = (isset($_SESSION["auth_mesa"]) && $_SESSION["auth_mesa"] == "1");
+
+// 2. Verificamos si es una Oficina (Ajusta "id_oficina" por la variable de sesión exacta que uses en tu login de oficinas)
+$es_oficina = isset($_SESSION["id_oficina"]); 
+
+// 3. Si no es NINGUNO de los dos, lo expulsamos
+if (!$es_mesa && !$es_oficina) {
+    // Lo mandamos al index principal o login general
+    header("Location: ../index.php"); 
+    exit();
+}
+
 include("../conexion.php");
 
 $fechaInicio = "";
@@ -192,6 +206,28 @@ $resultado = mysqli_query($cn, $sql);
 
             color: white;
 
+        }
+
+        @media print {
+
+            .navbar,
+            .filtros,
+            .btn-imprimir {
+                display: none !important;
+            }
+
+            body,
+            .panel,
+            .container {
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                background: white;
+            }
+
+            body::before {
+                display: none;
+            }
         }
     </style>
 

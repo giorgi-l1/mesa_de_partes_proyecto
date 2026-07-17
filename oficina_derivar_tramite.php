@@ -74,32 +74,65 @@ if (!$res_check_destino || mysqli_num_rows($res_check_destino) == 0) {
     header("Location: principal_oficina.php?error=destino_invalido");
     exit();
 }
+// ----------------------------------------------------
+// 3. ACTUALIZAR Y REGISTRAR EN LA BASE DE DATOS
+// ----------------------------------------------------
+mysqli_begin_transaction($cn);
+$proceso_exitoso = false;
 
-// ----------------------------------------------------
-// 3. ACTUALIZAR LA UBICACIÓN ACTUAL DEL TRÁMITE
-// ----------------------------------------------------
-$query_update = "UPDATE tramites
-                 SET id_oficina_actual = '$id_oficina_destino', id_estado = " . ID_ESTADO_DERIVADO . "
-                 WHERE id_tramite = '$id_tramite'";
-mysqli_query($cn, $query_update);
+try {
+    // A. Actualizar la ubicación actual del trámite
+    $query_update = "UPDATE tramites SET id_oficina_actual = '$id_oficina_destino', id_estado = " . ID_ESTADO_DERIVADO . " WHERE id_tramite = '$id_tramite'";
+    mysqli_query($cn, $query_update);
 
-// ----------------------------------------------------
-// 4. REGISTRAR EL MOVIMIENTO EN EL HISTORIAL
-// ----------------------------------------------------
-$query_num_mov = "SELECT COALESCE(MAX(numero_movimiento), 0) + 1 AS siguiente
-                  FROM movimientos_tramite WHERE id_tramite = '$id_tramite'";
-$res_num_mov = mysqli_query($cn, $query_num_mov);
-$siguiente_movimiento = 1;
-if ($res_num_mov && $fila = mysqli_fetch_assoc($res_num_mov)) {
-    $siguiente_movimiento = intval($fila['siguiente']);
+    // B. Obtener siguiente número de movimiento
+    $query_num_mov = "SELECT COALESCE(MAX(numero_movimiento), 0) + 1 AS siguiente FROM movimientos_tramite WHERE id_tramite = '$id_tramite'";
+    $res_num_mov = mysqli_query($cn, $query_num_mov);
+    $siguiente_movimiento = 1;
+    if ($res_num_mov && $fila = mysqli_fetch_assoc($res_num_mov)) {
+        $siguiente_movimiento = intval($fila['siguiente']);
+    }
+
+    // C. Registrar el movimiento en el historial
+    $observaciones_escapadas = mysqli_real_escape_string($cn, $observaciones);
+    $query_movimiento = "INSERT INTO movimientos_tramite (id_tramite, numero_movimiento, id_oficina_origen, id_oficina_destino, id_estado_mov, observaciones) VALUES ('$id_tramite', '$siguiente_movimiento', '$id_oficina_origen', '$id_oficina_destino', " . ID_ESTADO_DERIVADO . ", '$observaciones_escapadas')";
+    mysqli_query($cn, $query_movimiento);
+
+    // D. Confirmar transacción
+    mysqli_commit($cn);
+    $proceso_exitoso = true; // Todo salió perfecto en la BD
+
+} catch (Exception $e) {
+    mysqli_rollback($cn);
+    header("Location: principal_oficina.php?error=bd");
+    exit();
 }
 
-$observaciones_escapadas = mysqli_real_escape_string($cn, $observaciones);
-$query_movimiento = "INSERT INTO movimientos_tramite
-                     (id_tramite, numero_movimiento, id_oficina_origen, id_oficina_destino, id_estado_mov, observaciones)
-                     VALUES ('$id_tramite', '$siguiente_movimiento', '$id_oficina_origen', '$id_oficina_destino', " . ID_ESTADO_DERIVADO . ", '$observaciones_escapadas')";
-mysqli_query($cn, $query_movimiento);
+// ----------------------------------------------------
+// 4. DISPARAR LA NOTIFICACIÓN (Aislado de la BD)
+// ----------------------------------------------------
+if ($proceso_exitoso) {
+    try {
+        require_once 'notificaciones.php';
+        
+        $query_datos = mysqli_query($cn, "SELECT id_usuario, numero_expediente FROM tramites WHERE id_tramite = '$id_tramite'");
+        if ($datos_tramite = mysqli_fetch_assoc($query_datos)) {
+            
+            // Obtener nombre de la oficina destino para el correo
+            $q_of = mysqli_query($cn, "SELECT nombre_oficina FROM oficinas WHERE id_oficina = '$id_oficina_destino'");
+            $d_of = mysqli_fetch_assoc($q_of);
+            $nombre_destino = $d_of['nombre_oficina'];
+            
+            $mensaje = "Su trámite ha continuado su curso y ha sido derivado al área de <b>$nombre_destino</b>. <br><b>Observación:</b> $observaciones_escapadas";
+            
+            notificar_usuario($cn, $datos_tramite['id_usuario'], 'derivado', $datos_tramite['numero_expediente'], $mensaje);
+        }
+    } catch (Throwable $t) {
+        // Falla silenciosa: Si WhatsApp/Correo falla o el archivo no se encuentra, 
+        // el usuario no verá un error falso, porque el documento ya se derivó.
+    }
 
-header("Location: principal_oficina.php?ok=derivado");
-exit();
+    header("Location: principal_oficina.php?ok=derivado");
+    exit();
+}
 ?>

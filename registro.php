@@ -53,11 +53,12 @@ if ($result_deps) {
             <div class="form-group full-width">
                 <label for="tipo_usuario">Tipo de Usuario *</label>
                 <select id="tipo_usuario" name="tipo_usuario" required onchange="mostrarCampos()">
-                    <option value="" disabled selected>-- Seleccione una opción --</option>
-                    <option value="1">Alumno</option>
-                    <option value="2">Personal / Docente</option>
-                    <option value="3">Egresado</option>
+                    <option value="" disabled selected>-- Seleccione --</option>
+                    <option value="1">Persona Natural</option>
+                    <option value="2">Alumno</option>
+                    <option value="3">Personal</option>
                     <option value="4">Institución Externa</option>
+                    <option value="5">Egresado</option>
                 </select>
             </div>
 
@@ -277,28 +278,36 @@ if ($result_deps) {
             document.getElementById("seccion_personal").style.display = "none";
             document.getElementById("seccion_egresado").style.display = "none";
             document.getElementById("seccion_institucion").style.display = "none";
-            document.getElementById("seccion_ubicacion").style.display = "none"; // <-- Agregado
+            document.getElementById("seccion_ubicacion").style.display = "none";
 
-            // 2. Mostrar según tipo
+            // 2. Mostrar según tipo alineado con el HTML
             if (tipo === "1") {
+                // PERSONA NATURAL: Solo datos personales y ubicación
                 document.getElementById("seccion_personales").style.display = "grid";
-                document.getElementById("seccion_alumno").style.display = "grid";
-                document.getElementById("seccion_ubicacion").style.display = "grid"; // <-- Mostrar Ubigeo
+                document.getElementById("seccion_ubicacion").style.display = "grid";
             }
             else if (tipo === "2") {
+                // ALUMNO
                 document.getElementById("seccion_personales").style.display = "grid";
-                document.getElementById("seccion_personal").style.display = "grid";
-                document.getElementById("seccion_ubicacion").style.display = "grid"; // <-- Mostrar Ubigeo
+                document.getElementById("seccion_alumno").style.display = "grid";
+                document.getElementById("seccion_ubicacion").style.display = "grid";
             }
             else if (tipo === "3") {
+                // PERSONAL / DOCENTE
                 document.getElementById("seccion_personales").style.display = "grid";
-                document.getElementById("seccion_egresado").style.display = "grid";
-                document.getElementById("seccion_ubicacion").style.display = "grid"; // <-- Mostrar Ubigeo
+                document.getElementById("seccion_personal").style.display = "grid";
+                document.getElementById("seccion_ubicacion").style.display = "grid";
             }
             else if (tipo === "4") {
+                // INSTITUCIÓN EXTERNA
                 document.getElementById("seccion_ubicacion").style.display = "grid";
                 document.getElementById("seccion_institucion").style.display = "grid";
-                // <-- AHORA SÍ SE MUESTRA PARA INSTITUCIÓN
+            }
+            else if (tipo === "5") {
+                // EGRESADO
+                document.getElementById("seccion_personales").style.display = "grid";
+                document.getElementById("seccion_egresado").style.display = "grid";
+                document.getElementById("seccion_ubicacion").style.display = "grid";
             }
         }
 

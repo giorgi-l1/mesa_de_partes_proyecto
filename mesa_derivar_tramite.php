@@ -98,7 +98,27 @@ $observaciones_escapadas = mysqli_real_escape_string($cn, $observaciones);
 $query_movimiento = "INSERT INTO movimientos_tramite
                      (id_tramite, numero_movimiento, id_oficina_origen, id_oficina_destino, id_estado_mov, observaciones)
                      VALUES ('$id_tramite', '$siguiente_movimiento', '$id_oficina_origen', '$id_oficina_destino', " . ID_ESTADO_DERIVADO . ", '$observaciones_escapadas')";
-mysqli_query($cn, $query_movimiento);
+// Confirmar cambios en la BD
+    mysqli_commit($cn);
 
-header("Location: principal_mesa.php?ok=derivado");
+    // --- MAGIA DE LA NOTIFICACIÓN ---
+    require_once 'notificaciones.php'; // Verifica que la ruta sea correcta
+    
+    $query_datos = mysqli_query($cn, "SELECT id_usuario, numero_expediente FROM tramites WHERE id_tramite = '$id_tramite'");
+    if ($datos_tramite = mysqli_fetch_assoc($query_datos)) {
+        
+        // Obtenemos el nombre de la oficina destino
+        $q_of = mysqli_query($cn, "SELECT nombre_oficina FROM oficinas WHERE id_oficina = '$id_oficina_destino'");
+        $d_of = mysqli_fetch_assoc($q_of);
+        $nombre_destino = $d_of['nombre_oficina'];
+        
+        $observaciones_escapadas = isset($observaciones) ? $observaciones : '';
+        $mensaje = "Su trámite ha sido derivado al área de <b>$nombre_destino</b>. <br><b>Observación:</b> $observaciones_escapadas";
+        
+        notificar_usuario($cn, $datos_tramite['id_usuario'], 'derivado', $datos_tramite['numero_expediente'], $mensaje);
+    }
+    // -----------------------------------
+
+    // Redirección final
+    header("Location: principal_mesa.php?ok=derivado");
 exit();

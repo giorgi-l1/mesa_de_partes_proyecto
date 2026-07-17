@@ -30,7 +30,7 @@ $tipo_mensaje = "";
 
 if (isset($_POST['accion']) && isset($_POST['id_ticket'])) {
     $id_ticket = intval($_POST['id_ticket']);
-    
+
     if ($_POST['accion'] == 'leer') {
         $query_update = "UPDATE tickets_ayuda SET estado_ticket = 'Leído' WHERE id_ticket = '$id_ticket'";
         if (mysqli_query($cn, $query_update)) {
@@ -57,7 +57,8 @@ if (isset($_POST['accion']) && isset($_POST['id_ticket'])) {
 // ----------------------------------------------------
 $por_pagina = 40;
 $pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
-if ($pagina_actual < 1) $pagina_actual = 1;
+if ($pagina_actual < 1)
+    $pagina_actual = 1;
 $offset = ($pagina_actual - 1) * $por_pagina;
 
 $query_total = "SELECT COUNT(*) AS total FROM tickets_ayuda";
@@ -75,12 +76,14 @@ $query_tickets = "SELECT t.id_ticket, t.codigo_ticket, tp.nombre_tipo AS tipo_ti
                          t.descripcion_problema AS mensaje, t.fecha_registro AS fecha_creacion, t.estado_ticket AS estado,
                          u.correo AS usuario_email,
                          dp.nombres, dp.apellido_paterno, dp.apellido_materno, dp.celular AS telefono,
-                         dj.razon_social
+                         dj.razon_social,
+                         tr.numero_expediente -- CAMBIO: Ahora traemos el expediente
                   FROM tickets_ayuda t
                   INNER JOIN usuarios u ON t.id_usuario = u.id_usuario
                   INNER JOIN tipos_ticket tp ON t.id_tipo_ticket = tp.id_tipo_ticket
                   LEFT JOIN datos_personales dp ON t.id_usuario = dp.id_usuario
                   LEFT JOIN datos_juridicos dj ON t.id_usuario = dj.id_usuario
+                  LEFT JOIN tramites tr ON t.id_tramite = tr.id_tramite -- CAMBIO: Unimos con tramites
                   ORDER BY t.estado_ticket ASC, t.fecha_registro DESC
                   LIMIT $por_pagina OFFSET $offset";
 $res_tickets = mysqli_query($cn, $query_tickets);
@@ -92,7 +95,9 @@ $res_tickets = mysqli_query($cn, $query_tickets);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mesa de Ayuda - Administración | UNJFSC</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Montserrat:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
@@ -113,7 +118,8 @@ $res_tickets = mysqli_query($cn, $query_tickets);
             </div>
 
             <span class="nav-info-oficina">
-                🏢 <?php echo htmlspecialchars($staff['nombre_oficina']); ?> (<?php echo htmlspecialchars($staff['siglas']); ?>)
+                🏢 <?php echo htmlspecialchars($staff['nombre_oficina']); ?>
+                (<?php echo htmlspecialchars($staff['siglas']); ?>)
                 &nbsp;·&nbsp; <?php echo htmlspecialchars($staff['nombre_rol_generico']); ?>
             </span>
 
@@ -123,15 +129,17 @@ $res_tickets = mysqli_query($cn, $query_tickets);
 
     <div class="container">
         <div class="panel">
-            
+
             <div class="panel-header-flex">
                 <h2 class="panel-title panel-title-clean">Bandeja de Mesa de Ayuda</h2>
                 <span class="pill-cargo" style="background-color: #007bff;">Tickets de Soporte</span>
             </div>
-            <p class="panel-subtitulo">Bandeja administrativa para leer, gestionar y atender las sugerencias, quejas o reclamos emitidos por los usuarios.</p>
+            <p class="panel-subtitulo">Bandeja administrativa para leer, gestionar y atender las sugerencias, quejas o
+                reclamos emitidos por los usuarios.</p>
 
             <?php if ($mensaje_flash): ?>
-                <div class="mensaje-flash mensaje-<?php echo $tipo_mensaje; ?>"><?php echo htmlspecialchars($mensaje_flash); ?></div>
+                <div class="mensaje-flash mensaje-<?php echo $tipo_mensaje; ?>">
+                    <?php echo htmlspecialchars($mensaje_flash); ?></div>
             <?php endif; ?>
 
             <div class="table-container">
@@ -155,19 +163,24 @@ $res_tickets = mysqli_query($cn, $query_tickets);
                                 $remitente = !empty($tk['razon_social'])
                                     ? $tk['razon_social']
                                     : trim($tk['nombres'] . ' ' . $tk['apellido_paterno'] . ' ' . $tk['apellido_materno']);
-                                if ($remitente === '') $remitente = 'Anónimo / Desconocido';
+                                if ($remitente === '')
+                                    $remitente = 'Anónimo / Desconocido';
 
                                 $telefono = !empty($tk['telefono']) ? $tk['telefono'] : '—';
 
                                 $badge_color = "#6c757d";
-                                if (strcasecmp($tk['tipo_ticket'], 'Reclamo') == 0) $badge_color = "#dc3545";
-                                if (strcasecmp($tk['tipo_ticket'], 'Queja') == 0) $badge_color = "#ffc107";
-                                if (strcasecmp($tk['tipo_ticket'], 'Sugerencia') == 0) $badge_color = "#28a745";
+                                if (strcasecmp($tk['tipo_ticket'], 'Reclamo') == 0)
+                                    $badge_color = "#dc3545";
+                                if (strcasecmp($tk['tipo_ticket'], 'Queja') == 0)
+                                    $badge_color = "#ffc107";
+                                if (strcasecmp($tk['tipo_ticket'], 'Sugerencia') == 0)
+                                    $badge_color = "#28a745";
                                 ?>
                                 <tr>
                                     <td><strong><?php echo htmlspecialchars($tk['codigo_ticket']); ?></strong></td>
                                     <td>
-                                        <span style="background-color: <?php echo $badge_color; ?>; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block;">
+                                        <span
+                                            style="background-color: <?php echo $badge_color; ?>; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block;">
                                             <?php echo htmlspecialchars(strtoupper($tk['tipo_ticket'])); ?>
                                         </span>
                                     </td>
@@ -180,9 +193,20 @@ $res_tickets = mysqli_query($cn, $query_tickets);
                                     </td>
                                     <td class="col-descripcion">
                                         <strong><?php echo htmlspecialchars($tk['asunto']); ?></strong><br>
-                                        <span style="color: #555; font-size: 12px;"><?php echo htmlspecialchars($tk['mensaje']); ?></span>
+                                        <span
+                                            style="color: #555; font-size: 12px;"><?php echo htmlspecialchars($tk['mensaje']); ?></span>
+                                        <!-- CAMBIO: Muestra el expediente si el ticket lo tiene -->
+                                        <?php if (!empty($tk['numero_expediente'])): ?>
+                                            <br>
+                                            <span
+                                                style="background-color: #17a2b8; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; display: inline-block; margin-top: 5px;">
+                                                📄 Expediente: <?php echo htmlspecialchars($tk['numero_expediente']); ?>
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
-                                    <td><span style="font-size: 12px;"><?php echo htmlspecialchars($tk['fecha_creacion']); ?></span></td>
+                                    <td><span
+                                            style="font-size: 12px;"><?php echo htmlspecialchars($tk['fecha_creacion']); ?></span>
+                                    </td>
                                     <td>
                                         <?php if (strcasecmp($tk['estado'], 'Abierto') == 0 || strcasecmp($tk['estado'], 'Pendiente') == 0): ?>
                                             <span style="color: #dc3545; font-weight: bold; font-size: 12px;">⏳ Abierto</span>
@@ -193,21 +217,39 @@ $res_tickets = mysqli_query($cn, $query_tickets);
                                         <?php endif; ?>
                                     </td>
                                     <td class="col-acciones">
-                                        <?php if (strcasecmp($tk['estado'], 'Abierto') == 0 || strcasecmp($tk['estado'], 'Pendiente') == 0): ?>
-                                            <form action="mesa_ayuda_mesa.php" method="POST" class="form-inline">
-                                                <input type="hidden" name="id_ticket" value="<?php echo $tk['id_ticket']; ?>">
-                                                <input type="hidden" name="accion" value="leer">
-                                                <button type="submit" class="btn-accion btn-finalizar" style="background-color: #007bff;">Marcar Leído</button>
-                                            </form>
-                                        <?php elseif (strcasecmp($tk['estado'], 'Leído') == 0): ?>
-                                            <form action="mesa_ayuda_mesa.php" method="POST" onsubmit="return confirm('¿Confirmas que has revisado y atendido este ticket?');" class="form-inline">
-                                                <input type="hidden" name="id_ticket" value="<?php echo $tk['id_ticket']; ?>">
-                                                <input type="hidden" name="accion" value="atender">
-                                                <button type="submit" class="btn-accion btn-finalizar" style="background-color: #28a745;">Marcar Atendido</button>
-                                            </form>
-                                        <?php else: ?>
-                                            <button disabled class="btn-accion" style="background-color: #e0e0e0; color: #a0a0a0; cursor: not-allowed; border: none;">Listo</button>
-                                        <?php endif; ?>
+                                        <!-- CAMBIO: Flexbox para alinear el botón de detalle con los de estado -->
+                                        <div style="display: flex; gap: 5px; align-items: center; justify-content: flex-start;">
+
+                                            <!-- NUEVO BOTÓN DE DETALLES -->
+                                            <a href="detalle_ticket.php?id_ticket=<?php echo $tk['id_ticket']; ?>"
+                                                class="btn-accion" title="Ver Detalles"
+                                                style="background-color: #6c757d; color: white; padding: 6px 10px; text-decoration: none; border-radius: 4px; font-size: 14px;">
+                                                👁️
+                                            </a>
+
+                                            <?php if (strcasecmp($tk['estado'], 'Abierto') == 0 || strcasecmp($tk['estado'], 'Pendiente') == 0): ?>
+                                                <form action="mesa_ayuda_mesa.php" method="POST" class="form-inline"
+                                                    style="margin:0;">
+                                                    <input type="hidden" name="id_ticket" value="<?php echo $tk['id_ticket']; ?>">
+                                                    <input type="hidden" name="accion" value="leer">
+                                                    <button type="submit" class="btn-accion btn-finalizar"
+                                                        style="background-color: #007bff;">Marcar Leído</button>
+                                                </form>
+                                            <?php elseif (strcasecmp($tk['estado'], 'Leído') == 0): ?>
+                                                <form action="mesa_ayuda_mesa.php" method="POST"
+                                                    onsubmit="return confirm('¿Confirmas que has revisado y atendido este ticket?');"
+                                                    class="form-inline" style="margin:0;">
+                                                    <input type="hidden" name="id_ticket" value="<?php echo $tk['id_ticket']; ?>">
+                                                    <input type="hidden" name="accion" value="atender">
+                                                    <button type="submit" class="btn-accion btn-finalizar"
+                                                        style="background-color: #28a745;">Marcar Atendido</button>
+                                                </form>
+                                            <?php else: ?>
+                                                <button disabled class="btn-accion"
+                                                    style="background-color: #e0e0e0; color: #a0a0a0; cursor: not-allowed; border: none;">Listo</button>
+                                            <?php endif; ?>
+
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -226,21 +268,25 @@ $res_tickets = mysqli_query($cn, $query_tickets);
             <?php if ($total_tickets > 0): ?>
                 <div class="paginacion">
                     <span class="paginacion-info">
-                        Mostrando <?php echo ($offset + 1); ?>–<?php echo min($offset + $por_pagina, $total_tickets); ?> de <?php echo $total_tickets; ?> tickets
+                        Mostrando <?php echo ($offset + 1); ?>–<?php echo min($offset + $por_pagina, $total_tickets); ?> de
+                        <?php echo $total_tickets; ?> tickets
                     </span>
                     <div class="paginacion-controles">
                         <?php if ($pagina_actual > 1): ?>
-                            <a href="mesa_ayuda_mesa.php?pagina=<?php echo $pagina_actual - 1; ?>" class="pagina-btn">&larr; Anterior</a>
+                            <a href="mesa_ayuda_mesa.php?pagina=<?php echo $pagina_actual - 1; ?>" class="pagina-btn">&larr;
+                                Anterior</a>
                         <?php else: ?>
                             <span class="pagina-btn pagina-disabled">&larr; Anterior</span>
                         <?php endif; ?>
 
                         <?php for ($p = 1; $p <= $total_paginas; $p++): ?>
-                            <a href="mesa_ayuda_mesa.php?pagina=<?php echo $p; ?>" class="pagina-btn <?php echo ($p == $pagina_actual) ? 'pagina-activa' : ''; ?>"><?php echo $p; ?></a>
+                            <a href="mesa_ayuda_mesa.php?pagina=<?php echo $p; ?>"
+                                class="pagina-btn <?php echo ($p == $pagina_actual) ? 'pagina-activa' : ''; ?>"><?php echo $p; ?></a>
                         <?php endfor; ?>
 
                         <?php if ($pagina_actual < $total_paginas): ?>
-                            <a href="mesa_ayuda_mesa.php?pagina=<?php echo $pagina_actual + 1; ?>" class="pagina-btn">Siguiente &rarr;</a>
+                            <a href="mesa_ayuda_mesa.php?pagina=<?php echo $pagina_actual + 1; ?>" class="pagina-btn">Siguiente
+                                &rarr;</a>
                         <?php else: ?>
                             <span class="pagina-btn pagina-disabled">Siguiente &rarr;</span>
                         <?php endif; ?>
@@ -252,4 +298,5 @@ $res_tickets = mysqli_query($cn, $query_tickets);
     </div>
 
 </body>
+
 </html>

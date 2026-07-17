@@ -116,6 +116,7 @@ if ($res_stats) {
                     <a href="perfil.php">Actualizar Datos Personales</a>
                     <a href="perfil_foto.php">Cambiar Foto de Perfil</a>
                     <a href="cambiar_password.php">Cambiar Contraseña</a>
+                    <a href="configuracion_alertas.php">Notificaciones</a>
                 </div>
             </div>
             <div class="dropdown">

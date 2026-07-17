@@ -89,7 +89,7 @@ confirmButtonColor:'#198754'
 
 }).then(()=>{
 
-window.location='oficinas.php';
+window.location='oficinas_listar.php';
 
 });
 

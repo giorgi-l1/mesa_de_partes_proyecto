@@ -160,7 +160,7 @@ Guardar
 </button>
 
 <a
-href="oficinas.php"
+href="oficinas_listar.php"
 class="btn btn-cancelar">
 
 Cancelar

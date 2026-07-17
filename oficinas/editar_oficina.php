@@ -3,7 +3,7 @@
 include("../conexion.php");
 
 if(!isset($_GET["id"])){
-    header("Location: oficinas.php");
+    header("Location: oficinas_listar.php");
     exit();
 }
 
@@ -143,7 +143,7 @@ Actualizar
 </button>
 
 <a
-href="oficinas.php"
+href="oficinas_listar.php"
 class="btn btn-cancelar">
 
 Cancelar
