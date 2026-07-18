@@ -82,7 +82,7 @@ $res_tramites = mysqli_query($cn, $query_tramites);
                 <div class="dropdown-content">
                     <a href="nuevo_tramite.php">Iniciar Nuevo Trámite</a>
                     <a href="mis_tramites.php">Revisar Mis Trámites</a>
-                    <a href="historial_tramites.php" class="active">Historial Completo</a>
+                    <a href="historial_tramites.php" class="active">Trámites Completos</a>
                 </div>
             </div>
 

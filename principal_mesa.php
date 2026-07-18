@@ -220,12 +220,11 @@ if ($res_oficinas) {
                                             </button>
                                         <?php endif; ?>
 
-                                        <a href="tramites/rechazar_tramite.php?id=<?php echo $t['id_tramite']; ?>"
-                                            onclick="return confirm('¿Estás completamente seguro de rechazar el expediente <?php echo htmlspecialchars($t['numero_expediente'], ENT_QUOTES); ?>?');"
-                                            class="btn-accion"
-                                            style="background-color: #dc3545; color: white; text-decoration: none; display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-left: 5px;">
+                                        <button type="button" class="btn-accion"
+                                            style="background-color: #dc3545; color: white; text-decoration: none; display: inline-block; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-left: 5px; border: none; cursor: pointer;"
+                                            onclick="abrirModalRechazar('<?php echo $t['id_tramite']; ?>', '<?php echo htmlspecialchars($t['numero_expediente'], ENT_QUOTES); ?>')">
                                             Rechazar
-                                        </a>
+                                        </button>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -351,7 +350,32 @@ if ($res_oficinas) {
                 </form>
             </div>
         </div>
+        <!-- Modal para Rechazar Trámite -->
+        <div id="modalRechazar" class="modal-overlay" style="display:none;">
+            <div class="modal-box">
+                <h3 style="color: #dc3545;">Rechazar / Observar Trámite</h3>
+                <p class="modal-expediente">Expediente: <strong id="modalExpedienteRechazoTexto"></strong></p>
 
+                <form action="tramites/rechazar_tramite.php" method="POST">
+                    <!-- Pasamos el ID por POST oculto igual que en el otro modal -->
+                    <input type="hidden" name="id" id="modalIdTramiteRechazo" value="">
+
+                    <div class="form-group-modal">
+                        <label for="observaciones_rechazo">Motivo del rechazo / Observación (Obligatorio)</label>
+                        <textarea name="observaciones" id="observaciones_rechazo" rows="3"
+                            placeholder="Escribe el motivo exacto por el que se rechaza para notificar al usuario..."
+                            required></textarea>
+                    </div>
+
+                    <div class="modal-acciones">
+                        <button type="button" class="btn-modal-cancelar" onclick="cerrarModalRechazar()">Cancelar</button>
+                        <!-- Botón rojo para mantener el estilo de peligro/alerta -->
+                        <button type="submit" class="btn-modal-confirmar"
+                            style="background-color: #dc3545; border-color: #dc3545;">Confirmar Rechazo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <script>
             function abrirModalDerivar(idTramite, numeroExpediente) {
                 document.getElementById('modalIdTramite').value = idTramite;
@@ -416,9 +440,29 @@ if ($res_oficinas) {
                     chatBody.scrollTop = chatBody.scrollHeight;
                 }, 400);
             }
+            // Funciones para el Modal de Rechazo
+            function abrirModalRechazar(idTramite, numeroExpediente) {
+                document.getElementById('modalIdTramiteRechazo').value = idTramite;
+                document.getElementById('modalExpedienteRechazoTexto').textContent = numeroExpediente;
+                // Limpiamos el textarea por si quedó texto de un intento anterior
+                document.getElementById('observaciones_rechazo').value = '';
+                document.getElementById('modalRechazar').style.display = 'flex';
+            }
 
+            function cerrarModalRechazar() {
+                document.getElementById('modalRechazar').style.display = 'none';
+            }
+
+            // Cerrar al hacer clic fuera de la caja del modal de rechazo
+            document.getElementById('modalRechazar').addEventListener('click', function (e) {
+                if (e.target === this) {
+                    cerrarModalRechazar();
+                }
+            });
         </script>
     <?php endif; ?>
+
+
 
 </body>
 

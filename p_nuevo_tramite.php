@@ -16,7 +16,7 @@ $enlace_externo = !empty($_POST['enlace_externo']) ? mysqli_real_escape_string($
 
 // -------------------------------------------------------------
 // 1. GENERACIÓN DEL NÚMERO DE EXPEDIENTE (Formato: EXP-YYYY-XXXXXX)
-// -------------------------------------------------------------
+// ------sq-------------------------------------------------------
 $anio_actual = date('Y');
 $prefijo = "EXP-" . $anio_actual . "-";
 
@@ -47,49 +47,44 @@ if (isset($_FILES['documento']) && $_FILES['documento']['error'] == 0) {
     $nombre_original = $archivo['name'];
     $tamano = $archivo['size'];
     $temporal = $archivo['tmp_name'];
-    
+
     // Validación de formato PDF
     $ext = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
     if ($ext !== 'pdf' || mime_content_type($temporal) !== 'application/pdf') {
         header("Location: nuevo_tramite.php?error=formato");
         exit();
     }
-    
+
     // Validación de peso (5MB = 5 * 1024 * 1024 bytes = 5242880 bytes)
     if ($tamano > 5242880) {
         header("Location: nuevo_tramite.php?error=peso");
         exit();
     }
-    
+
     // Crear carpeta dinámicamente si no existe
     $carpeta_destino = "documentos_adjuntos/" . $anio_actual . "/";
     if (!file_exists($carpeta_destino)) {
         mkdir($carpeta_destino, 0777, true);
     }
-    
+
     // Nombre único para no sobreescribir (Ej: EXP-2026-000001_171542.pdf)
     $nuevo_nombre = str_replace('-', '_', $numero_expediente) . "_" . time() . ".pdf";
     $ruta_final = $carpeta_destino . $nuevo_nombre;
-    
+
     if (move_uploaded_file($temporal, $ruta_final)) {
         $ruta_bd = "'" . mysqli_real_escape_string($cn, $ruta_final) . "'";
         $nombre_archivo_bd = "'" . mysqli_real_escape_string($cn, $nuevo_nombre) . "'";
         $tiene_archivo = true;
     }
 }
-
 // -------------------------------------------------------------
 // 3. INSERCIÓN EN BASE DE DATOS (Transacción)
 // -------------------------------------------------------------
 mysqli_begin_transaction($cn);
 
 try {
-    // A. Obtener el área de destino por defecto del trámite
-    $query_destino = "SELECT id_oficina_destino_defecto FROM tipos_tramite WHERE id_tipo_tramite = '$id_tipo_tramite'";
-    $res_destino = mysqli_query($cn, $query_destino);
-    $fila_destino = mysqli_fetch_assoc($res_destino);
-    // Si no tiene destino por defecto, se manda a UTD Central (id=1)
-    $id_oficina_actual = $fila_destino['id_oficina_destino_defecto'] ? $fila_destino['id_oficina_destino_defecto'] : 1;
+    // A. Forzamos el área de destino a UTD Central / Mesa de Partes (id = 1)
+    $id_oficina_actual = 1;
     $id_estado = 1; // 1 = Pendiente
 
     // B. Insertar la Cabecera del Trámite
@@ -107,10 +102,11 @@ try {
     }
 
     // D. Registrar el Primer Movimiento (Historial)
-    // Se registra como si la UTD (1) recepcionara y derivara automáticamente a la oficina correspondiente
-    $observacion_mov = "Documento registrado vía Mesa de Partes Virtual.";
+    // Ingresa con origen NULL (Usuario Web) hacia el destino 1 (Mesa de Partes / UTD)
+    $observacion_mov = "Documento registrado vía Mesa de Partes Virtual. Pendiente de revisión por UTD.";
+    // Ingresa con origen 5 (Plataforma Web) hacia el destino 1 (Mesa de Partes / UTD)
     $sql_movimiento = "INSERT INTO movimientos_tramite (id_tramite, numero_movimiento, id_oficina_origen, id_oficina_destino, id_estado_mov, observaciones) 
-                       VALUES ('$id_tramite_generado', 1, 1, '$id_oficina_actual', '$id_estado', '$observacion_mov')";
+                       VALUES ('$id_tramite_generado', 1, 5, 1, '$id_estado', '$observacion_mov')";
     mysqli_query($cn, $sql_movimiento);
 
     // Confirmar todo
@@ -121,7 +117,6 @@ try {
 
 } catch (Exception $e) {
     mysqli_rollback($cn);
-    // En producción se borraría el archivo subido si falla la DB, pero como práctica básica lo omitimos
     header("Location: nuevo_tramite.php?error=db");
     exit();
 }

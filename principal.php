@@ -50,12 +50,12 @@ if ($id_tipo == 4) {
             $tipo_texto = "Egresado";
     }
 }
-
 // ----------------------------------------------------
 // 2. OBTENER ESTADÍSTICAS REALES DE LA BD
 // ----------------------------------------------------
 $pendientes = 0;
 $en_proceso = 0;
+$rechazados = 0;
 $atendidos = 0;
 
 /* Buscamos todos los trámites del usuario y los agrupamos por su estado */
@@ -69,12 +69,15 @@ $res_stats = mysqli_query($cn, $query_stats);
 if ($res_stats) {
     while ($row = mysqli_fetch_assoc($res_stats)) {
         $estado = strtolower($row['nombre_estado']);
-        // Clasificamos inteligentemente según el nombre del estado en tu BD
-        if (strpos($estado, 'pendient') !== false || strpos($estado, 'ingresad') !== false) {
+
+        // Clasificamos exactamente según los nombres de la base de datos
+        if (strpos($estado, 'pendient') !== false) {
             $pendientes += $row['total'];
-        } elseif (strpos($estado, 'proces') !== false || strpos($estado, 'derivad') !== false || strpos($estado, 'observad') !== false) {
-            $en_proceso += $row['total'];
-        } elseif (strpos($estado, 'atendid') !== false || strpos($estado, 'finalizad') !== false || strpos($estado, 'rechazad') !== false) {
+        } elseif (strpos($estado, 'revisi') !== false || strpos($estado, 'derivad') !== false) {
+            $en_proceso += $row['total']; // Solo los que de verdad están en proceso
+        } elseif (strpos($estado, 'rechazad') !== false || strpos($estado, 'observad') !== false) {
+            $rechazados += $row['total']; // Separamos los rechazados
+        } elseif (strpos($estado, 'atendid') !== false || strpos($estado, 'finalizad') !== false) {
             $atendidos += $row['total'];
         }
     }
@@ -106,7 +109,7 @@ if ($res_stats) {
                 <div class="dropdown-content">
                     <a href="nuevo_tramite.php">Iniciar Nuevo Trámite</a>
                     <a href="mis_tramites.php">Revisar Mis Trámites</a>
-                    <a href="historial_tramites.php">Historial Completo</a>
+                    <a href="historial_tramites.php">Trámites Completos</a>
                 </div>
             </div>
 
@@ -180,6 +183,10 @@ if ($res_stats) {
                         <h2><?php echo $en_proceso; ?></h2>
                         <p>En Proceso</p>
                     </div>
+                    <div class="stat-card" style="border-color: #dc3545;">
+                        <h2><?php echo $rechazados; ?></h2>
+                        <p>Rechazados</p>
+                    </div>
                     <div class="stat-card" style="border-color: #198754;">
                         <h2><?php echo $atendidos; ?></h2>
                         <p>Atendidos</p>
@@ -221,11 +228,13 @@ if ($res_stats) {
                                         $estado_bd = strtolower($tramite['nombre_estado']);
                                         $clase_badge = "status-pendiente"; // Por defecto
                                 
-                                        if (strpos($estado_bd, 'proces') !== false)
+                                        if (strpos($estado_bd, 'revisi') !== false || strpos($estado_bd, 'derivad') !== false) {
                                             $clase_badge = "status-proceso";
-                                        if (strpos($estado_bd, 'atendid') !== false)
+                                        } elseif (strpos($estado_bd, 'rechazad') !== false || strpos($estado_bd, 'observad') !== false) {
+                                            $clase_badge = "status-rechazado"; // Asegúrate de tener esta clase en tu dashboard.css (ej. color rojo)
+                                        } elseif (strpos($estado_bd, 'atendid') !== false || strpos($estado_bd, 'finalizad') !== false) {
                                             $clase_badge = "status-atendido";
-
+                                        }
                                         // CORRECCIÓN AQUÍ: Usamos fecha_envio
                                         $fecha_formateada = date("d/m/Y H:i", strtotime($tramite['fecha_envio']));
 
@@ -297,48 +306,48 @@ if ($res_stats) {
 
 </html>
 <script>
-function toggleChat() {
-    const windowChat = document.getElementById('chatbot-window');
-    const bubble = document.getElementById('chatbot-bubble');
-    if (windowChat.style.display === 'none' || windowChat.style.display === '') {
-        windowChat.style.display = 'flex';
-        bubble.style.transform = 'scale(0.9)';
-    } else {
-        windowChat.style.display = 'none';
-        bubble.style.transform = 'scale(1)';
-    }
-}
-
-function botResponder(opcion) {
-    const chatBody = document.getElementById('chat-body');
-    const optionsDiv = document.getElementById('chat-options');
-    
-    optionsDiv.style.display = 'none';
-    
-    let respuestaTexto = "";
-    let botonAccion = "";
-
-    if (opcion === 'nuevo') {
-        respuestaTexto = "Puedes registrar una nueva solicitud o adjuntar tus documentos del formato FUT directamente desde el módulo de registro.";
-        botonAccion = `<a href="nuevo_tramite.php" style="display:inline-block; background:#791518; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Iniciar Trámite ➡️</a>`;
-    } else if (opcion === 'estado') {
-        respuestaTexto = "Para revisar en qué oficina se encuentra tu expediente, los documentos adjuntos y sus observaciones, ingresa a tu bandeja.";
-        botonAccion = `<a href="mis_tramites.php" style="display:inline-block; background:#6c757d; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Mis Trámites ➡️</a>`;
-    } else if (opcion === 'reclamo') {
-        respuestaTexto = "Si tienes inconvenientes con el uso de la plataforma o alguna queja sobre tu atención, puedes abrir un ticket de soporte.";
-        botonAccion = `<a href="mesa_ayuda.php" style="display:inline-block; background:#ffc107; color:black; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Registrar Ticket ➡️</a>`;
+    function toggleChat() {
+        const windowChat = document.getElementById('chatbot-window');
+        const bubble = document.getElementById('chatbot-bubble');
+        if (windowChat.style.display === 'none' || windowChat.style.display === '') {
+            windowChat.style.display = 'flex';
+            bubble.style.transform = 'scale(0.9)';
+        } else {
+            windowChat.style.display = 'none';
+            bubble.style.transform = 'scale(1)';
+        }
     }
 
-    setTimeout(() => {
-        chatBody.innerHTML += `
+    function botResponder(opcion) {
+        const chatBody = document.getElementById('chat-body');
+        const optionsDiv = document.getElementById('chat-options');
+
+        optionsDiv.style.display = 'none';
+
+        let respuestaTexto = "";
+        let botonAccion = "";
+
+        if (opcion === 'nuevo') {
+            respuestaTexto = "Puedes registrar una nueva solicitud o adjuntar tus documentos del formato FUT directamente desde el módulo de registro.";
+            botonAccion = `<a href="nuevo_tramite.php" style="display:inline-block; background:#791518; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Iniciar Trámite ➡️</a>`;
+        } else if (opcion === 'estado') {
+            respuestaTexto = "Para revisar en qué oficina se encuentra tu expediente, los documentos adjuntos y sus observaciones, ingresa a tu bandeja.";
+            botonAccion = `<a href="mis_tramites.php" style="display:inline-block; background:#6c757d; color:white; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Mis Trámites ➡️</a>`;
+        } else if (opcion === 'reclamo') {
+            respuestaTexto = "Si tienes inconvenientes con el uso de la plataforma o alguna queja sobre tu atención, puedes abrir un ticket de soporte.";
+            botonAccion = `<a href="mesa_ayuda.php" style="display:inline-block; background:#ffc107; color:black; padding:8px 12px; border-radius:5px; text-decoration:none; font-size:12px; font-weight:bold; margin-top:5px;">Registrar Ticket ➡️</a>`;
+        }
+
+        setTimeout(() => {
+            chatBody.innerHTML += `
             <div style="background: #e9ecef; padding: 10px; border-radius: 8px; font-size: 13px; max-width: 85%; color: #333; margin-top: 5px;">
                 ${respuestaTexto}<br>${botonAccion}
             </div>
         `;
-        
-        optionsDiv.style.display = 'flex';
-        chatBody.appendChild(optionsDiv);
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }, 400);
-}
+
+            optionsDiv.style.display = 'flex';
+            chatBody.appendChild(optionsDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }, 400);
+    }
 </script>

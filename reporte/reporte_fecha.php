@@ -5,24 +5,27 @@ session_start();
 $es_mesa = (isset($_SESSION["auth_mesa"]) && $_SESSION["auth_mesa"] == "1");
 
 // 2. Verificamos si es una Oficina (Ajusta "id_oficina" por la variable de sesión exacta que uses en tu login de oficinas)
-$es_oficina = isset($_SESSION["id_oficina"]); 
+$es_oficina = isset($_SESSION["id_oficina"]);
 
 // 3. Si no es NINGUNO de los dos, lo expulsamos
 if (!$es_mesa && !$es_oficina) {
     // Lo mandamos al index principal o login general
-    header("Location: ../index.php"); 
+    header("Location: ../index.php");
     exit();
 }
 
 include("../conexion.php");
-
 $fechaInicio = "";
 $fechaFin = "";
 $where = "";
 
-if (isset($_GET["buscar"])) {
-    $fechaInicio = $_GET["fecha_inicio"];
-    $fechaFin = $_GET["fecha_fin"];
+// Paginación por defecto y captura de variables
+$limite_seleccionado = isset($_GET['limite']) ? $_GET['limite'] : 'todos';
+$pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
+
+if (isset($_GET["buscar"]) || isset($_GET["pagina"])) {
+    $fechaInicio = isset($_GET["fecha_inicio"]) ? $_GET["fecha_inicio"] : "";
+    $fechaFin = isset($_GET["fecha_fin"]) ? $_GET["fecha_fin"] : "";
 
     if ($fechaInicio != "" && $fechaFin != "") {
         $where = "
@@ -33,42 +36,42 @@ if (isset($_GET["buscar"])) {
     }
 }
 
-$sql = "
-
-SELECT
-
-t.numero_expediente,
-
-u.correo,
-
-tt.nombre_tramite,
-
-t.asunto,
-
-o.nombre_oficina,
-
-e.nombre_estado,
-
-t.fecha_envio
-
+// 1. Contar el total de registros para la paginación
+$sql_count = "
+SELECT COUNT(*) as total 
 FROM tramites t
-
-INNER JOIN usuarios u
-ON t.id_usuario=u.id_usuario
-
-INNER JOIN tipos_tramite tt
-ON t.id_tipo_tramite=tt.id_tipo_tramite
-
-INNER JOIN oficinas o
-ON t.id_oficina_actual=o.id_oficina
-
-INNER JOIN estados_tramite e
-ON t.id_estado=e.id_estado
-
+INNER JOIN usuarios u ON t.id_usuario=u.id_usuario
+INNER JOIN tipos_tramite tt ON t.id_tipo_tramite=tt.id_tipo_tramite
+INNER JOIN oficinas o ON t.id_oficina_actual=o.id_oficina
+INNER JOIN estados_tramite e ON t.id_estado=e.id_estado
 $where
+";
+$resultado_count = mysqli_query($cn, $sql_count);
+$total_registros = mysqli_fetch_assoc($resultado_count)['total'];
 
+// 2. Calcular límites y páginas
+$limit_sql = "";
+$total_paginas = 1;
+
+if ($limite_seleccionado !== 'todos') {
+    $registros_por_pagina = intval($limite_seleccionado);
+    $total_paginas = ceil($total_registros / $registros_por_pagina);
+    $offset = ($pagina_actual - 1) * $registros_por_pagina;
+    $limit_sql = " LIMIT $offset, $registros_por_pagina";
+}
+
+// 3. Consulta final aplicando el LIMIT si corresponde
+$sql = "
+SELECT
+t.numero_expediente, u.correo, tt.nombre_tramite, t.asunto, o.nombre_oficina, e.nombre_estado, t.fecha_envio
+FROM tramites t
+INNER JOIN usuarios u ON t.id_usuario=u.id_usuario
+INNER JOIN tipos_tramite tt ON t.id_tipo_tramite=tt.id_tipo_tramite
+INNER JOIN oficinas o ON t.id_oficina_actual=o.id_oficina
+INNER JOIN estados_tramite e ON t.id_estado=e.id_estado
+$where
 ORDER BY t.fecha_envio DESC
-
+$limit_sql
 ";
 
 $resultado = mysqli_query($cn, $sql);
@@ -102,7 +105,7 @@ $resultado = mysqli_query($cn, $sql);
 
             display: grid;
 
-            grid-template-columns: 1fr 1fr auto;
+            grid-template-columns: 1fr 1fr 1fr auto;
 
             gap: 20px;
 
@@ -268,180 +271,157 @@ $resultado = mysqli_query($cn, $sql);
             </p>
 
             <form method="GET">
-
                 <div class="filtros">
-
                     <div>
-
-                        <label>
-
-                            Fecha Inicio
-
-                        </label>
-
+                        <label>Fecha Inicio</label>
                         <input type="date" name="fecha_inicio" class="form-control" value="<?php echo $fechaInicio; ?>"
                             required>
-
                     </div>
-
                     <div>
-
-                        <label>
-
-                            Fecha Fin
-
-                        </label>
-
+                        <label>Fecha Fin</label>
                         <input type="date" name="fecha_fin" class="form-control" value="<?php echo $fechaFin; ?>"
                             required>
-
                     </div>
-
+                    <div>
+                        <label>Mostrar</label>
+                        <select name="limite" class="form-control">
+                            <option value="todos" <?php if ($limite_seleccionado == 'todos')
+                                echo 'selected'; ?>>Todos los
+                                registros</option>
+                            <option value="20" <?php if ($limite_seleccionado == '20')
+                                echo 'selected'; ?>>20 por página
+                            </option>
+                            <option value="40" <?php if ($limite_seleccionado == '40')
+                                echo 'selected'; ?>>40 por página
+                            </option>
+                            <option value="100" <?php if ($limite_seleccionado == '100')
+                                echo 'selected'; ?>>100 por
+                                página</option>
+                        </select>
+                    </div>
                     <div style="display:flex;align-items:end;">
-
-                        <button type="submit" name="buscar" class="btn btn-buscar">
-
-                            Buscar
-
-                        </button>
-
+                        <button type="submit" name="buscar" class="btn btn-buscar">Buscar</button>
                     </div>
-
                 </div>
+            </form> <!-- ⚠️ AQUÍ CERRAMOS EL FORMULARIO PARA QUE EL EDITOR NO FALLE -->
 
-                <table class="tabla">
 
-                    <thead>
 
-                        <tr>
+            <table class="tabla">
 
-                            <th>Expediente</th>
+                <thead>
 
-                            <th>Correo</th>
+                    <tr>
 
-                            <th>Tipo Trámite</th>
+                        <th>Expediente</th>
 
-                            <th>Asunto</th>
+                        <th>Correo</th>
 
-                            <th>Área</th>
+                        <th>Tipo Trámite</th>
 
-                            <th>Estado</th>
+                        <th>Asunto</th>
 
-                            <th>Fecha</th>
+                        <th>Área</th>
 
-                        </tr>
+                        <th>Estado</th>
 
-                    </thead>
+                        <th>Fecha</th>
 
-                    <tbody>
+                    </tr>
 
-                        <?php
+                </thead>
 
-                        if (mysqli_num_rows($resultado) > 0) {
+                <tbody>
 
-                            while ($fila = mysqli_fetch_assoc($resultado)) {
+                    <?php
 
-                                $color = "#ffc107";
+                    if (mysqli_num_rows($resultado) > 0) {
 
-                                switch ($fila["nombre_estado"]) {
+                        while ($fila = mysqli_fetch_assoc($resultado)) {
 
-                                    case "Pendiente":
-                                        $color = "#ffc107";
-                                        break;
+                            $color = "#ffc107";
 
-                                    case "En Revisión":
-                                        $color = "#0d6efd";
-                                        break;
+                            switch ($fila["nombre_estado"]) {
 
-                                    case "Derivado":
-                                        $color = "#198754";
-                                        break;
+                                case "Pendiente":
+                                    $color = "#ffc107";
+                                    break;
 
-                                    case "Observado/Rechazado":
-                                        $color = "#dc3545";
-                                        break;
+                                case "En Revisión":
+                                    $color = "#0d6efd";
+                                    break;
 
-                                    case "Atendido/Finalizado":
-                                        $color = "#6f42c1";
-                                        break;
+                                case "Derivado":
+                                    $color = "#198754";
+                                    break;
 
-                                }
+                                case "Observado/Rechazado":
+                                    $color = "#dc3545";
+                                    break;
 
-                                ?>
-
-                                <tr>
-
-                                    <td>
-
-                                        <?php echo htmlspecialchars($fila["numero_expediente"]); ?>
-
-                                    </td>
-
-                                    <td>
-
-                                        <?php echo htmlspecialchars($fila["correo"]); ?>
-
-                                    </td>
-
-                                    <td>
-
-                                        <?php echo htmlspecialchars($fila["nombre_tramite"]); ?>
-
-                                    </td>
-
-                                    <td>
-
-                                        <?php echo htmlspecialchars($fila["asunto"]); ?>
-
-                                    </td>
-
-                                    <td>
-
-                                        <?php echo htmlspecialchars($fila["nombre_oficina"]); ?>
-
-                                    </td>
-
-                                    <td>
-
-                                        <span class="estado" style="background:<?php echo $color; ?>;">
-
-                                            <?php echo htmlspecialchars($fila["nombre_estado"]); ?>
-
-                                        </span>
-
-                                    </td>
-
-                                    <td>
-
-                                        <?php
-
-                                        echo date(
-
-                                            "d/m/Y H:i",
-
-                                            strtotime($fila["fecha_envio"])
-
-                                        );
-
-                                        ?>
-
-                                    </td>
-
-                                </tr>
-
-                                <?php
+                                case "Atendido/Finalizado":
+                                    $color = "#6f42c1";
+                                    break;
 
                             }
-
-                        } else {
 
                             ?>
 
                             <tr>
 
-                                <td colspan="7" style="text-align:center;padding:30px;color:#777;">
+                                <td>
 
-                                    No existen trámites registrados para el rango de fechas seleccionado.
+                                    <?php echo htmlspecialchars($fila["numero_expediente"]); ?>
+
+                                </td>
+
+                                <td>
+
+                                    <?php echo htmlspecialchars($fila["correo"]); ?>
+
+                                </td>
+
+                                <td>
+
+                                    <?php echo htmlspecialchars($fila["nombre_tramite"]); ?>
+
+                                </td>
+
+                                <td>
+
+                                    <?php echo htmlspecialchars($fila["asunto"]); ?>
+
+                                </td>
+
+                                <td>
+
+                                    <?php echo htmlspecialchars($fila["nombre_oficina"]); ?>
+
+                                </td>
+
+                                <td>
+
+                                    <span class="estado" style="background:<?php echo $color; ?>;">
+
+                                        <?php echo htmlspecialchars($fila["nombre_estado"]); ?>
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <?php
+
+                                    echo date(
+
+                                        "d/m/Y H:i",
+
+                                        strtotime($fila["fecha_envio"])
+
+                                    );
+
+                                    ?>
 
                                 </td>
 
@@ -451,23 +431,82 @@ $resultado = mysqli_query($cn, $sql);
 
                         }
 
+                    } else {
+
                         ?>
 
-                    </tbody>
+                        <tr>
 
-                </table>
+                            <td colspan="7" style="text-align:center;padding:30px;color:#777;">
 
-                <br>
+                                No existen trámites registrados para el rango de fechas seleccionado.
 
-                <div style="display:flex;justify-content:flex-end;gap:10px;">
+                            </td>
 
-                    <button type="button" class="btn btn-imprimir" onclick="window.print();">
+                        </tr>
 
-                        🖨 Imprimir Reporte
+                        <?php
 
-                    </button>
+                    }
 
+                    ?>
+
+                </tbody>
+
+            </table>
+
+
+            <!-- BLOQUE DE PAGINACIÓN VISIBLE SIEMPRE -->
+            <div
+                style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 15px; border-radius: 8px;">
+                <span style="font-size: 14px; color: #555;">
+                    <?php if ($limite_seleccionado === 'todos'): ?>
+                        Mostrando <strong>todos</strong> los registros (<strong><?php echo $total_registros; ?></strong> en
+                        total)
+                    <?php else: ?>
+                        Mostrando página <strong><?php echo $pagina_actual; ?></strong> de
+                        <strong><?php echo $total_paginas > 0 ? $total_paginas : 1; ?></strong>
+                        (<strong><?php echo $total_registros; ?></strong> registros en total)
+                    <?php endif; ?>
+                </span>
+
+                <div style="display: flex; gap: 10px;">
+                    <?php if ($limite_seleccionado !== 'todos'): ?>
+
+                        <!-- Botón Anterior -->
+                        <?php if ($pagina_actual > 1): ?>
+                            <a href="?fecha_inicio=<?php echo $fechaInicio; ?>&fecha_fin=<?php echo $fechaFin; ?>&limite=<?php echo $limite_seleccionado; ?>&pagina=<?php echo $pagina_actual - 1; ?>&buscar="
+                                class="btn" style="background:#6c757d; font-size: 13px; text-decoration:none;">Anterior</a>
+                        <?php else: ?>
+                            <span class="btn"
+                                style="background:#e9ecef; color:#adb5bd; font-size: 13px; cursor:not-allowed;">Anterior</span>
+                        <?php endif; ?>
+
+                        <!-- Botón Siguiente -->
+                        <?php if ($pagina_actual < $total_paginas): ?>
+                            <a href="?fecha_inicio=<?php echo $fechaInicio; ?>&fecha_fin=<?php echo $fechaFin; ?>&limite=<?php echo $limite_seleccionado; ?>&pagina=<?php echo $pagina_actual + 1; ?>&buscar="
+                                class="btn" style="background:#6c757d; font-size: 13px; text-decoration:none;">Siguiente</a>
+                        <?php else: ?>
+                            <span class="btn"
+                                style="background:#e9ecef; color:#adb5bd; font-size: 13px; cursor:not-allowed;">Siguiente</span>
+                        <?php endif; ?>
+
+                    <?php endif; ?>
                 </div>
+            </div>
+
+
+            <br>
+
+            <div style="display:flex;justify-content:flex-end;gap:10px;">
+
+                <button type="button" class="btn btn-imprimir" onclick="window.print();">
+
+                    🖨 Imprimir Reporte
+
+                </button>
+
+            </div>
 
         </div>
 
@@ -476,5 +515,3 @@ $resultado = mysqli_query($cn, $sql);
 </body>
 
 </html>
-
-

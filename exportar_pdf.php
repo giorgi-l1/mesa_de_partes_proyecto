@@ -57,7 +57,7 @@ if ($id_tipo == 4) {
     $r = mysqli_query($cn, $q);
     if ($f = mysqli_fetch_assoc($r)) {
         $nombre_usuario = $f['nombres'] . ' ' . $f['apellido_paterno'] . ' ' . $f['apellido_materno'];
-        $documento_usuario = "Doc: " . $f['numero_documento'];
+        $documento_usuario = "DNI: " . $f['numero_documento'];
     }
 }
 

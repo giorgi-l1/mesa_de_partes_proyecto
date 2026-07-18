@@ -73,7 +73,7 @@ $c_finalizado = isset($config['alerta_finalizado']) ? $config['alerta_finalizado
                 <div class="dropdown-content">
                     <a href="nuevo_tramite.php">Iniciar Nuevo Trámite</a>
                     <a href="mis_tramites.php">Revisar Mis Trámites</a>
-                    <a href="historial_tramites.php">Historial Completo</a>
+                    <a href="historial_tramites.php">Trámites Completos</a>
                 </div>
             </div>
 
