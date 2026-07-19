@@ -11,9 +11,9 @@ require 'conexion.php';
 $id_usuario = $_SESSION["id_usuario"];
 
 // ----------------------------------------------------
-// 1. PAGINACIÓN (10 registros por página)
+// 1. PAGINACIÓN (40 registros por página)
 // ----------------------------------------------------
-$por_pagina = 10;
+$por_pagina = 40;
 $pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
 if ($pagina_actual < 1) {
     $pagina_actual = 1;

@@ -20,7 +20,7 @@ $fechaFin = "";
 $where = "";
 
 // Paginación por defecto y captura de variables
-$limite_seleccionado = isset($_GET['limite']) ? $_GET['limite'] : 'todos';
+$limite_seleccionado = isset($_GET['limite']) ? $_GET['limite'] : '40';
 $pagina_actual = isset($_GET['pagina']) ? intval($_GET['pagina']) : 1;
 
 if (isset($_GET["buscar"]) || isset($_GET["pagina"])) {

@@ -5,12 +5,12 @@ session_start();
 $es_mesa = (isset($_SESSION["auth_mesa"]) && $_SESSION["auth_mesa"] == "1");
 
 // 2. Verificamos si es una Oficina (Ajusta "id_oficina" por la variable de sesión exacta que uses en tu login de oficinas)
-$es_oficina = isset($_SESSION["id_oficina"]); 
+$es_oficina = isset($_SESSION["id_oficina"]);
 
 // 3. Si no es NINGUNO de los dos, lo expulsamos
 if (!$es_mesa && !$es_oficina) {
     // Lo mandamos al index principal o login general
-    header("Location: ../index.php"); 
+    header("Location: ../index.php");
     exit();
 }
 
@@ -69,6 +69,14 @@ $sql_count = "SELECT COUNT(*) as total FROM tramites t
               $where_sql";
 $total_registros = mysqli_fetch_assoc(mysqli_query($cn, $sql_count))['total'];
 $total_paginas = ceil($total_registros / $registros_por_pagina);
+
+$total_registros = mysqli_fetch_assoc(mysqli_query($cn, $sql_count))['total'];
+$total_paginas = ceil($total_registros / $registros_por_pagina);
+
+// --- NUEVAS LÍNEAS PARA CALCULAR EL RANGO ---
+$inicio_registro = $total_registros > 0 ? $offset + 1 : 0;
+$fin_registro = min($offset + $registros_por_pagina, $total_registros);
+
 
 // Consulta final con LIMIT y OFFSET
 // Reemplaza tu SELECT actual con este:
@@ -330,8 +338,8 @@ $resultado = mysqli_query($cn, $sql);
                 </table>
                 <div class="paginacion">
                     <span class="paginacion-info">
-                        Mostrando página <?php echo $pagina_actual; ?> de
-                        <?php echo $total_paginas > 0 ? $total_paginas : 1; ?>
+                        Mostrando <?php echo $inicio_registro; ?>–<?php echo $fin_registro; ?> de
+                        <?php echo $total_registros; ?> trámites
                     </span>
                     <div class="paginacion-controles">
                         <?php if ($pagina_actual > 1): ?>

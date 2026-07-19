@@ -13,10 +13,11 @@
     font-family: 'Montserrat', sans-serif;
 }
 
-/* FONDO Y CAPA OSCURA */
+/* =========================================
+   FONDO Y CAPA OSCURA
+========================================= */
 body {
     background-image: url('../img/img_principal.png');
-    /* Asegúrate de que la ruta sea correcta */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -35,7 +36,9 @@ body::before {
     z-index: -1;
 }
 
-/* NAVBAR */
+/* =========================================
+   NAVBAR Y DROPDOWNS
+========================================= */
 .navbar {
     background-color: var(--azul-oscuro);
     padding: 0 40px;
@@ -60,6 +63,7 @@ body::before {
 
 .nav-links {
     display: flex;
+    align-items: center;
     height: 100%;
 }
 
@@ -86,22 +90,70 @@ body::before {
     background-color: #dc3545;
     color: white !important;
     border-radius: 4px;
-    height: 40px !important;
-    margin-top: 15px;
     margin-left: 20px;
-    padding: 0 20px !important;
+    padding: 10px 20px !important;
     border-bottom: none !important;
+    transition: background 0.3s;
 }
 
 .btn-logout:hover {
     background-color: #c82333;
 }
 
-/* CONTENEDORES Y PANELES */
-/* CONTENEDORES Y PANELES */
+.dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.dropbtn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 15px;
+    color: #e0e0e0;
+    font-weight: 500;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--azul-oscuro);
+    min-width: 220px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    top: 70px;
+    border-top: 3px solid var(--dorado-arena);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 15px 20px;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    height: auto;
+}
+
+.dropdown-content a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--dorado-arena);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* =========================================
+   CONTENEDORES Y PANELES
+========================================= */
 .container {
     max-width: 1400px;
-    /* Antes estaba en 1200px. Esto lo ensanchará. */
     margin: 40px auto;
     padding: 0 20px;
 }
@@ -112,7 +164,6 @@ body::before {
     padding: 0 20px;
 }
 
-/* Para el perfil */
 .panel {
     background: var(--blanco-transparente);
     padding: 30px;
@@ -130,7 +181,29 @@ body::before {
     padding-bottom: 10px;
 }
 
-/* GRIDS Y PERFIL */
+.panel-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.panel-title-clean {
+    border: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.panel-subtitulo {
+    color: #777;
+    font-size: 0.9rem;
+    margin: 6px 0 18px 0;
+}
+
+/* =========================================
+   GRIDS Y PERFIL
+========================================= */
 .dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 2fr;
@@ -181,7 +254,19 @@ body::before {
     text-transform: uppercase;
 }
 
-/* BOTONES */
+.pill-cargo {
+    background: var(--fondo-gris);
+    color: var(--azul-institucional);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* =========================================
+   BOTONES
+========================================= */
 .action-btn {
     display: block;
     width: 100%;
@@ -227,11 +312,76 @@ body::before {
     background-color: var(--dorado-arena);
 }
 
-/* ESTADÍSTICAS Y TABLAS */
+.btn-volver {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: 10px;
+    transition: color 0.2s;
+}
+
+.btn-volver:hover {
+    color: var(--dorado-arena);
+}
+
+.btn-pdf {
+    width: auto;
+    padding: 12px 22px;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.btn-ver-detalle {
+    display: inline-block;
+    background: var(--azul-institucional);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-ver-detalle:hover {
+    background: var(--dorado-arena);
+}
+
+.btn-icono-pdf {
+    display: inline-block;
+    font-size: 1.2rem;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.btn-accion {
+    display: inline-block;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin: 2px;
+    color: white;
+    transition: opacity 0.2s;
+}
+
+.btn-accion:hover {
+    opacity: 0.85;
+}
+
+.btn-finalizar { background: #198754; }
+.btn-derivar { background: #b8860b; }
+
+/* =========================================
+   ESTADÍSTICAS Y TABLAS
+========================================= */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    /* Cambiamos de 3 a 4 columnas */
     gap: 15px;
     margin-bottom: 25px;
 }
@@ -268,8 +418,7 @@ table {
     margin-top: 10px;
 }
 
-th,
-td {
+th, td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #eee;
@@ -286,41 +435,40 @@ tr:hover {
     background-color: #f9f9f9;
 }
 
-/* ESTILOS DE ETIQUETAS DE ESTADO (BADGES) */
+.tabla-vacia {
+    text-align: center;
+    color: #888;
+    padding: 30px;
+}
+
+.tabla-vacia-icono {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.col-descripcion { max-width: 260px; }
+.col-acciones { white-space: nowrap; }
+
+/* =========================================
+   ESTILOS DE ESTADOS (BADGES)
+========================================= */
 .status-badge {
     padding: 6px 10px;
-    /* Un poco más de padding para que se vean mejor */
     border-radius: 4px;
     font-size: 0.8rem;
     font-weight: 600;
 }
 
-.status-pendiente {
-    background: #fff3cd;
-    color: #856404;
-}
+.status-pendiente { background: #fff3cd; color: #856404; } /* Amarillo */
+.status-proceso { background: #cce5ff; color: #004085; } /* Azul */
+.status-rechazado { background: #f8d7da; color: #721c24; } /* Rojo */
+.status-observado { background: #f8d7da; color: #721c24; } /* Rojo */
+.status-atendido { background: #d4edda; color: #155724; } /* Verde */
+.status-derivado { background: #e2d9f3; color: #4b2e83; } /* Morado */
 
-/* Amarillo */
-.status-proceso {
-    background: #cce5ff;
-    color: #004085;
-}
-
-/* Azul */
-.status-rechazado {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-/* Rojo (Observado/Rechazado) */
-.status-atendido {
-    background: #d4edda;
-    color: #155724;
-}
-
-/* Verde */
-
-/* FORMULARIOS (Para Perfil y Nuevo Trámite) */
+/* =========================================
+   FORMULARIOS Y ALERTAS
+========================================= */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -351,15 +499,12 @@ tr:hover {
 .form-group select,
 .form-group textarea {
     width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 1rem;
     transition: border 0.3s;
     background: white;
-    font-family: 'Montserrat', sans-serif;
 }
 
 .form-group input:focus,
@@ -374,6 +519,10 @@ input[readonly] {
     color: #6c757d;
     border: 1px dashed #adb5bd;
     cursor: not-allowed;
+}
+
+.form-inline {
+    display: inline;
 }
 
 .alert {
@@ -396,82 +545,87 @@ input[readonly] {
     font-style: italic;
 }
 
-/* =========================================
-   MENÚ DESPLEGABLE (DROPDOWNS) CORREGIDO
-========================================= */
-
-
-.dropdown {
-    position: relative;
-    display: flex;
-    /* Cambiado a flex para alineación perfecta */
-    align-items: center;
-    height: 100%;
-}
-
-.dropbtn {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 10px 15px;
-    /* Mismo relleno que tus enlaces <a> normales */
-    color: #e0e0e0;
-    /* O el color que usen tus enlaces inactivos */
+.mensaje-flash {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
     font-weight: 500;
 }
 
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: var(--azul-oscuro);
-    min-width: 220px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
-    z-index: 10;
-    top: 70px;
-    /* Misma altura del navbar */
-    border-top: 3px solid var(--dorado-arena);
-    border-radius: 0 0 8px 8px;
-    overflow: hidden;
+.mensaje-exito {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
 }
 
-.dropdown-content a {
-    color: white;
-    padding: 15px 20px;
-    text-decoration: none;
-    display: block;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    height: auto;
-}
-
-.dropdown-content a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--dorado-arena);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
+.mensaje-error {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
 }
 
 /* =========================================
-   VISTA: DETALLE DEL TRÁMITE (ver_detalle.php)
+   PAGINACIÓN
 ========================================= */
-.status-pendiente {
-    background: #fff3cd;
-    color: #856404;
+.paginacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
 }
 
-.status-derivado {
-    background: #e2d9f3;
-    color: #4b2e83;
+.paginacion-info {
+    color: #777;
+    font-size: 0.85rem;
 }
 
-.status-observado {
-    background: #f8d7da;
-    color: #721c24;
+.paginacion-controles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
+.pagina-btn {
+    display: inline-block;
+    padding: 7px 13px;
+    border-radius: 6px;
+    background: var(--fondo-gris);
+    color: var(--azul-institucional);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+}
+
+.pagina-btn:hover {
+    background: var(--azul-institucional);
+    color: white;
+}
+
+.pagina-activa {
+    background: var(--azul-institucional);
+    color: white;
+}
+
+.pagina-disabled {
+    background: #f1f1f1;
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagina-disabled:hover {
+    background: #f1f1f1;
+    color: #ccc;
+}
+
+/* =========================================
+   VISTA DE DETALLES Y TIMELINE
+========================================= */
 .detalle-header {
     display: flex;
     justify-content: space-between;
@@ -479,20 +633,6 @@ input[readonly] {
     flex-wrap: wrap;
     gap: 15px;
     margin: 30px 0 20px 0;
-}
-
-.btn-volver {
-    color: #e0e0e0;
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    display: inline-block;
-    margin-bottom: 10px;
-    transition: color 0.2s;
-}
-
-.btn-volver:hover {
-    color: var(--dorado-arena);
 }
 
 .detalle-titulo {
@@ -512,13 +652,6 @@ input[readonly] {
     align-items: center;
     gap: 15px;
     flex-wrap: wrap;
-}
-
-.btn-pdf {
-    width: auto;
-    padding: 12px 22px;
-    margin-bottom: 0;
-    white-space: nowrap;
 }
 
 .detalle-grid {
@@ -694,178 +827,9 @@ input[readonly] {
     font-weight: 500;
 }
 
-@media (max-width: 700px) {
-    .detalle-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .detalle-item.full-width {
-        grid-column: span 1;
-    }
-}
-
-.btn-ver-detalle {
-    display: inline-block;
-    background: var(--azul-institucional);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: background 0.2s;
-}
-
-.btn-ver-detalle:hover {
-    background: var(--dorado-arena);
-}
-
 /* =========================================
-   VISTA: MIS TRÁMITES (mis_tramites.php) - PAGINACIÓN
+   MODAL DE DERIVACIÓN
 ========================================= */
-.paginacion {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-}
-
-.paginacion-info {
-    color: #777;
-    font-size: 0.85rem;
-}
-
-.paginacion-controles {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.pagina-btn {
-    display: inline-block;
-    padding: 7px 13px;
-    border-radius: 6px;
-    background: var(--fondo-gris);
-    color: var(--azul-institucional);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: background 0.2s, color 0.2s;
-}
-
-.pagina-btn:hover {
-    background: var(--azul-institucional);
-    color: white;
-}
-
-.pagina-activa {
-    background: var(--azul-institucional);
-    color: white;
-}
-
-.pagina-disabled {
-    background: #f1f1f1;
-    color: #ccc;
-    cursor: not-allowed;
-}
-
-.pagina-disabled:hover {
-    background: #f1f1f1;
-    color: #ccc;
-}
-
-/* =========================================
-   VISTA: PANEL DE GESTIÓN Y DERIVACIÓN (Rol Oficina)
-========================================= */
-.nav-info-oficina {
-    color: #d8d8d8;
-    font-size: 0.85rem;
-    margin-left: auto;
-    margin-right: 20px;
-    white-space: nowrap;
-}
-
-.panel-subtitulo {
-    color: #777;
-    font-size: 0.9rem;
-    margin: 6px 0 18px 0;
-}
-
-.pill-cargo {
-    background: var(--fondo-gris);
-    color: var(--azul-institucional);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.mensaje-flash {
-    padding: 12px 16px;
-    border-radius: 6px;
-    margin-bottom: 18px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.mensaje-exito {
-    background: #d4edda;
-    color: #155724;
-    border-left: 4px solid #28a745;
-}
-
-.mensaje-error {
-    background: #f8d7da;
-    color: #721c24;
-    border-left: 4px solid #dc3545;
-}
-
-.col-descripcion {
-    max-width: 260px;
-}
-
-.col-acciones {
-    white-space: nowrap;
-}
-
-.btn-icono-pdf {
-    display: inline-block;
-    font-size: 1.2rem;
-    text-decoration: none;
-    line-height: 1;
-}
-
-.btn-accion {
-    display: inline-block;
-    border: none;
-    padding: 7px 12px;
-    border-radius: 6px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    cursor: pointer;
-    margin: 2px;
-    color: white;
-    transition: opacity 0.2s;
-}
-
-.btn-accion:hover {
-    opacity: 0.85;
-}
-
-.btn-finalizar {
-    background: #198754;
-}
-
-.btn-derivar {
-    background: #b8860b;
-}
-
-/* --- MODAL DE DERIVACIÓN --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -918,7 +882,6 @@ input[readonly] {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 6px;
-    font-family: 'Montserrat', sans-serif;
     font-size: 0.9rem;
     resize: vertical;
 }
@@ -955,33 +918,49 @@ input[readonly] {
 }
 
 /* =========================================
-   ESTILOS NORMALIZADOS DE LA BANDEJA
+   MEDIA QUERIES (RESPONSIVE)
 ========================================= */
-.panel-header-flex {
+@media (max-width: 700px) {
+    .detalle-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detalle-item.full-width {
+        grid-column: span 1;
+    }
+}
+.nav-info-oficina {
+    color: #e0e0e0; /* Un gris muy clarito, casi blanco */
+    font-size: 0.85rem;
+    margin-left: auto;
+    margin-right: 20px;
+    white-space: nowrap;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
+}
+/* =========================================
+   CORRECCIÓN INPUT DE ARCHIVO (PDF)
+========================================= */
+.form-group input[type="file"] {
+    padding: 7px; /* Reducimos el padding que causaba el espacio extra */
+    background: #fcfcfc;
+    cursor: pointer;
 }
 
-.panel-title-clean {
+/* Le damos estilo al botón nativo de "Seleccionar archivo" */
+.form-group input[type="file"]::file-selector-button {
+    background-color: var(--azul-institucional);
+    color: white;
     border: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-right: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
 }
 
-.form-inline {
-    display: inline;
-}
-
-.tabla-vacia {
-    text-align: center;
-    color: #888;
-    padding: 30px;
-}
-
-.tabla-vacia-icono {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+.form-group input[type="file"]::file-selector-button:hover {
+    background-color: var(--dorado-arena);
 }

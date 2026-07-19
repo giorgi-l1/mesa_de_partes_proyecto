@@ -60,12 +60,12 @@
 
             <button type="submit" class="btn-submit">INGRESAR</button>
 
-            <div style="display: flex; justify-content: space-between; margin-top: 25px;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 25px;">
                 <a href="consulta.php" onmouseover="this.style.color='#c5a059'" onmouseout="this.style.color='#666'"
                     style="color: #666; font-size: 0.85rem; text-decoration: none; border-bottom: 1px dashed #ccc; transition: color 0.3s ease;">
                     ¿Consultar un expediente?
                 </a>
-                
+
                 <a href="login_mesa.php" onmouseover="this.style.color='#c5a059'" onmouseout="this.style.color='#666'"
                     style="color: #666; font-size: 0.85rem; text-decoration: none; border-bottom: 1px dashed #ccc; transition: color 0.3s ease;">
                     ¿Eres usuario de Mesa/Oficina?

@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Validación de sesión original
 if (!isset($_SESSION["auth"]) || $_SESSION["auth"] != "1") {
     header("Location: index.php");
     exit();
@@ -9,12 +10,36 @@ if (!isset($_SESSION["auth"]) || $_SESSION["auth"] != "1") {
 require 'conexion.php';
 $id_usuario = $_SESSION["id_usuario"];
 
-// Obtener los tickets del usuario logueado, ordenados por los más recientes
+/* =========================================
+   LÓGICA DE PAGINACIÓN (40 por página)
+========================================= */
+$registros_por_pagina = 40;
+
+// Obtener la página actual por GET, por defecto es 1
+$pagina_actual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($pagina_actual < 1) {
+    $pagina_actual = 1;
+}
+
+// Calcular desde dónde empezar a traer registros (OFFSET)
+$offset = ($pagina_actual - 1) * $registros_por_pagina;
+
+// Contar el total de registros del usuario para saber el total de páginas
+$query_total = "SELECT COUNT(*) as total FROM tickets_ayuda WHERE id_usuario = '$id_usuario'";
+$result_total = mysqli_query($cn, $query_total);
+$row_total = mysqli_fetch_assoc($result_total);
+$total_registros = $row_total['total'];
+$total_paginas = ceil($total_registros / $registros_por_pagina);
+
+/* =========================================
+   CONSULTA DE TICKETS CON LIMIT
+========================================= */
 $query_tickets = "SELECT t.codigo_ticket, tp.nombre_tipo, t.asunto, t.descripcion_problema, t.fecha_registro, t.estado_ticket 
                   FROM tickets_ayuda t
                   INNER JOIN tipos_ticket tp ON t.id_tipo_ticket = tp.id_tipo_ticket
                   WHERE t.id_usuario = '$id_usuario'
-                  ORDER BY t.fecha_registro DESC";
+                  ORDER BY t.fecha_registro DESC
+                  LIMIT $offset, $registros_por_pagina";
 
 $result_tickets = mysqli_query($cn, $query_tickets);
 ?>
@@ -164,6 +189,60 @@ $result_tickets = mysqli_query($cn, $query_tickets);
                     </tbody>
                 </table>
             </div>
+
+            <!-- CONTROLES DE PAGINACIÓN -->
+            <?php if ($total_paginas > 1): ?>
+                <div class="paginacion">
+                    <div class="paginacion-info">
+                        Mostrando página <strong><?php echo $pagina_actual; ?></strong> de <strong><?php echo $total_paginas; ?></strong> 
+                        (Total: <?php echo $total_registros; ?> registros)
+                    </div>
+                    <div class="paginacion-controles">
+                        <!-- Botón Anterior -->
+                        <?php if ($pagina_actual > 1): ?>
+                            <a href="?pagina=<?php echo $pagina_actual - 1; ?>" class="pagina-btn">Anterior</a>
+                        <?php else: ?>
+                            <span class="pagina-btn pagina-disabled">Anterior</span>
+                        <?php endif; ?>
+
+                        <!-- Botones Numéricos -->
+                        <?php
+                        // Logica para no llenar la pantalla de botones si hay muchas páginas
+                        $inicio_bucle = max(1, $pagina_actual - 2);
+                        $fin_bucle = min($total_paginas, $pagina_actual + 2);
+
+                        if ($inicio_bucle > 1) {
+                            echo '<a href="?pagina=1" class="pagina-btn">1</a>';
+                            if ($inicio_bucle > 2) {
+                                echo '<span class="pagina-btn pagina-disabled">...</span>';
+                            }
+                        }
+
+                        for ($i = $inicio_bucle; $i <= $fin_bucle; $i++) {
+                            if ($i == $pagina_actual) {
+                                echo '<span class="pagina-btn pagina-activa">' . $i . '</span>';
+                            } else {
+                                echo '<a href="?pagina=' . $i . '" class="pagina-btn">' . $i . '</a>';
+                            }
+                        }
+
+                        if ($fin_bucle < $total_paginas) {
+                            if ($fin_bucle < $total_paginas - 1) {
+                                echo '<span class="pagina-btn pagina-disabled">...</span>';
+                            }
+                            echo '<a href="?pagina=' . $total_paginas . '" class="pagina-btn">' . $total_paginas . '</a>';
+                        }
+                        ?>
+
+                        <!-- Botón Siguiente -->
+                        <?php if ($pagina_actual < $total_paginas): ?>
+                            <a href="?pagina=<?php echo $pagina_actual + 1; ?>" class="pagina-btn">Siguiente</a>
+                        <?php else: ?>
+                            <span class="pagina-btn pagina-disabled">Siguiente</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
         </div>
     </div>
