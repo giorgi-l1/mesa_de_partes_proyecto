@@ -21,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (mysqli_num_rows($resultado) == 1) {
         $usuario = mysqli_fetch_assoc($resultado);
+
         // -------------------------------------------------------------
         // VALIDACIÓN DE ESTADO: Verificar que no esté dado de baja
         // -------------------------------------------------------------
@@ -28,24 +29,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: login_mesa.php?error=cuenta_inactiva");
             exit();
         }
+
         // -------------------------------------------------------------
-        // VALIDACIÓN ESTRICTA: Solo entran Mesa (6) y Oficinas (7)
+        // VALIDACIÓN ESTRICTA DE TIPOS PERMITIDOS (Mesa, Oficina o Admin)
         // -------------------------------------------------------------
-        if ($usuario['id_tipo'] != 6 && $usuario['id_tipo'] != 7) {
+        if ($usuario['id_tipo'] != 6 && $usuario['id_tipo'] != 7 && $usuario['id_tipo'] != 5) {
+            // Asumiendo que 5 o el ID que use tu admin es válido, o si es tipo 6/7 con correo especial.
             header("Location: login_mesa.php?error=user_tipo_invalido");
             exit();
         }
         
-        // Verificamos contraseña usando trim() por si hay espacios en la BD
+        // Verificamos contraseña
         if ($password === trim($usuario['password'])) {
             
             // Credenciales correctas
             $_SESSION["auth_mesa"] = "1"; 
             $_SESSION["id_usuario"] = $usuario['id_usuario'];
             $_SESSION["id_tipo"] = $usuario['id_tipo']; 
-            $_SESSION["rol"] = ($usuario['id_tipo'] == 6) ? "mesa" : "oficina";
+
+            // ---------------------------------------------------------
+            // REDIRECCIÓN DISCRETA AL SUPERADMIN (Por Correo o ID)
+            // ---------------------------------------------------------
+            // Opción A: Por correo institucional exacto del Superadmin
+            /*
+            if ($usuario['correo'] === 'admin@unjfsc.edu.pe' || $usuario['correo'] === 'admin_general@unjfsc.edu.pe') {
+                $_SESSION["rol"] = "superadmin";
+                header("Location: principal_admin.php");
+                exit();
+            }
+            */
+            // Opción B: Si prefieres por ID único de usuario (descomentar si usas esta):
+            if ($usuario['id_usuario'] == 26) {
+                $_SESSION["rol"] = "superadmin";
+                header("Location: principal_admin.php");
+                exit();
+            }
             
-            // Enrutamiento según el tipo de usuario
+
+            // ---------------------------------------------------------
+            // ENRUTAMIENTO REGULAR DE MESA Y OFICINAS
+            // ---------------------------------------------------------
+            $_SESSION["rol"] = ($usuario['id_tipo'] == 6) ? "mesa" : "oficina";
+
             if ($usuario['id_tipo'] == 6) {
                 header("Location: principal_mesa.php"); 
             } else {

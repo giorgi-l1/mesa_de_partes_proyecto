@@ -9,7 +9,11 @@ if (!isset($_SESSION["auth"]) || $_SESSION["auth"] != "1") {
 require 'conexion.php';
 
 // Obtener los tipos de trámite activos para el select
-$query_tipos = "SELECT id_tipo_tramite, nombre_tramite, descripcion FROM tipos_tramite ORDER BY id_tipo_tramite ASC";
+// Obtener SOLO los tipos de trámite activos para el select
+$query_tipos = "SELECT id_tipo_tramite, nombre_tramite, descripcion 
+                FROM tipos_tramite 
+                WHERE estado = 1 
+                ORDER BY id_tipo_tramite ASC";
 $result_tipos = mysqli_query($cn, $query_tipos);
 ?>
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+date_default_timezone_set('America/Lima');
 // Asumimos que el administrador tiene una variable de sesión distinta, por ejemplo "auth_admin"
 
 
@@ -370,7 +370,7 @@ $res_bandeja = mysqli_query($cn, $query_bandeja);
                             <th>ASUNTO</th>
                             <th>ÁREA ACTUAL</th>
                             <th>ESTADO</th>
-                            <th>ACCIÓN</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -396,11 +396,7 @@ $res_bandeja = mysqli_query($cn, $query_bandeja);
                                             <?php echo htmlspecialchars($t['nombre_estado']); ?>
                                         </span>
                                     </td>
-                                    <td>
-                                        <a href="detalle_tramite.php?id=<?php echo $t['id_tramite']; ?>"
-                                            style="background-color: #007bff; color: white; padding: 4px 10px; text-decoration: none; border-radius: 4px; font-size: 12px;">Ver
-                                            Detalle</a>
-                                    </td>
+                                    
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>

@@ -9,11 +9,17 @@ if (!isset($_GET['id'])) {
 
 $id_usuario = intval($_GET['id']);
 
-// Traer toda la información general
-$q_info = "SELECT u.*, t.nombre_tipo, dp.* 
+// Traer toda la información general y unir con las tablas específicas (Corregido)
+$q_info = "SELECT u.*, t.nombre_tipo, dp.*, 
+                  da.codigo_universitario, 
+                  dper.codigo_administrativo, 
+                  dj.ruc 
            FROM usuarios u
            INNER JOIN tipos_usuario t ON u.id_tipo = t.id_tipo
            LEFT JOIN datos_personales dp ON u.id_usuario = dp.id_usuario
+           LEFT JOIN datos_alumnos da ON u.id_usuario = da.id_usuario
+           LEFT JOIN datos_personal dper ON u.id_usuario = dper.id_usuario
+           LEFT JOIN datos_juridicos dj ON u.id_usuario = dj.id_usuario
            WHERE u.id_usuario = $id_usuario";
 
 $res_info = mysqli_query($cn, $q_info);
@@ -22,30 +28,38 @@ $usuario = mysqli_fetch_assoc($res_info);
 if (!$usuario) {
     die("Usuario no encontrado.");
 }
+
+// --- LÓGICA PARA MOSTRAR EL DOCUMENTO CORRECTO SEGÚN EL TIPO ---
+$doc_label = "Documento de Identidad";
+$doc_valor = htmlspecialchars(($usuario['tipo_documento'] ?? 'DNI') . ': ' . ($usuario['numero_documento'] ?? 'No registrado'));
+
+if ($usuario['id_tipo'] == 2 && !empty($usuario['codigo_universitario'])) {
+    // Es Alumno (Tipo 2)
+    $doc_label = "Código Universitario";
+    $doc_valor = htmlspecialchars($usuario['codigo_universitario']);
+} elseif ($usuario['id_tipo'] == 3 && !empty($usuario['codigo_administrativo'])) {
+    // Es Trabajador (Tipo 3)
+    $doc_label = "Código de Trabajador (DNI)";
+    $doc_valor = htmlspecialchars($usuario['codigo_administrativo']) . ' (' . htmlspecialchars($usuario['numero_documento'] ?? '') . ')';
+} elseif ($usuario['id_tipo'] == 4 && !empty($usuario['ruc'])) {
+    // Es Institución (Tipo 4)
+    $doc_label = "RUC de la Institución";
+    $doc_valor = htmlspecialchars($usuario['ruc']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalles del Usuario | UNJFSC</title>
-    <!-- Fuentes Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tu CSS Principal -->
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
-
-    <!-- Cabecera dinámica -->
-    <?php include 'cabecera_admin.php'; ?>   
-
+    <?php include 'cabecera_admin.php'; ?>
     <div class="container">
         <a href="gestion_usuarios.php" class="btn-volver">← Volver al listado</a>
-        
         <div class="panel">
-            <!-- CORRECCIÓN AQUÍ: Usamos panel-title y panel-subtitulo -->
             <div class="panel-header-flex" style="margin-bottom: 20px; align-items: center;">
                 <div>
                     <h2 class="panel-title panel-title-clean">Detalles del Usuario</h2>
@@ -67,7 +81,7 @@ if (!$usuario) {
                     <span class="detalle-label">ID del Sistema</span>
                     <span class="detalle-valor"><?= $usuario['id_usuario'] ?></span>
                 </div>
-                
+
                 <div class="detalle-item">
                     <span class="detalle-label">Correo de Acceso</span>
                     <span class="detalle-valor"><strong><?= htmlspecialchars($usuario['correo']) ?></strong></span>
@@ -76,16 +90,14 @@ if (!$usuario) {
                 <div class="detalle-item">
                     <span class="detalle-label">Nombres Completos</span>
                     <span class="detalle-valor">
-                        <?= htmlspecialchars($usuario['nombres'] ?? '') ?> 
+                        <?= htmlspecialchars($usuario['nombres'] ?? '') ?>
                         <?= htmlspecialchars(($usuario['apellido_paterno'] ?? '') . ' ' . ($usuario['apellido_materno'] ?? '')) ?>
                     </span>
                 </div>
 
                 <div class="detalle-item">
-                    <span class="detalle-label">Documento de Identidad</span>
-                    <span class="detalle-valor">
-                        <?= htmlspecialchars(($usuario['tipo_documento'] ?? 'DNI') . ': ' . ($usuario['numero_documento'] ?? 'No registrado')) ?>
-                    </span>
+                    <span class="detalle-label"><?= $doc_label ?></span>
+                    <span class="detalle-valor"><?= $doc_valor ?></span>
                 </div>
 
                 <div class="detalle-item">
@@ -97,6 +109,5 @@ if (!$usuario) {
             </div>
         </div>
     </div>
-         
 </body>
 </html>

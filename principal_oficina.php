@@ -114,10 +114,11 @@ $query_bandeja = "SELECT t.id_tramite, t.numero_expediente, t.asunto, t.descripc
                    LIMIT $por_pagina OFFSET $offset";
 $res_bandeja = mysqli_query($cn, $query_bandeja);
 
-// ----------------------------------------------------
-// 6. LISTA DE OFICINAS DISPONIBLES PARA DERIVAR
-// ----------------------------------------------------
-$query_oficinas = "SELECT id_oficina, nombre_oficina, siglas FROM oficinas WHERE id_oficina != '$id_oficina' ORDER BY nombre_oficina ASC";
+// 6. LISTA DE OFICINAS DISPONIBLES PARA DERIVAR (SOLO ACTIVAS)
+$query_oficinas = "SELECT id_oficina, nombre_oficina, siglas 
+                   FROM oficinas 
+                   WHERE id_oficina != '$id_oficina' AND estado = 1 
+                   ORDER BY nombre_oficina ASC";
 $res_oficinas = mysqli_query($cn, $query_oficinas);
 $oficinas_disponibles = [];
 if ($res_oficinas) {

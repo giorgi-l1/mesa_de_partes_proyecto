@@ -23,7 +23,7 @@
         <div class="dropdown">
             <a class="dropbtn">Gestor Tipo de Trámite ▼</a>
             <div class="dropdown-content">
-                <a href="tipos_tramite.php">Ver Tipos de Trámite</a>
+                <a href="gestion_tramites.php">Ver Tipos de Trámite</a>
             </div>
         </div>
 
