@@ -24,7 +24,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (mysqli_num_rows($resultado) == 1) {
         $usuario = mysqli_fetch_assoc($resultado);
-        
+        // VALIDACIÓN DE ESTADO: Si el usuario fue dado de baja (estado 0), lo rebotamos
+        if ($usuario['estado'] == 0) {
+            header("Location: index.php?error=inactivo");
+            exit();
+        }
         // 4. NUEVA VALIDACIÓN: ¿El tipo que eligió coincide con su tipo real en la BD?
         if ($tipo_login != $usuario['id_tipo']) {
             // Si eligió "Alumno" pero en la BD es "Docente", lo rebotamos

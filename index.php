@@ -31,6 +31,8 @@
                 echo '<div class="alerta-error">Contraseña incorrecta. Intente nuevamente.</div>';
             } else if ($_GET['error'] == 'user') {
                 echo '<div class="alerta-error">El usuario no está registrado.</div>';
+            } else if ($_GET['error'] == 'inactivo') {
+                echo '<div class="alerta-error">Su cuenta ha sido deshabilitada.</div>';
             }
         }
         ?>

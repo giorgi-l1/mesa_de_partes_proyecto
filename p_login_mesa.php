@@ -21,7 +21,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (mysqli_num_rows($resultado) == 1) {
         $usuario = mysqli_fetch_assoc($resultado);
-        
+        // -------------------------------------------------------------
+        // VALIDACIÓN DE ESTADO: Verificar que no esté dado de baja
+        // -------------------------------------------------------------
+        if ($usuario['estado'] != 1) {
+            header("Location: login_mesa.php?error=cuenta_inactiva");
+            exit();
+        }
         // -------------------------------------------------------------
         // VALIDACIÓN ESTRICTA: Solo entran Mesa (6) y Oficinas (7)
         // -------------------------------------------------------------
